@@ -1161,10 +1161,11 @@ function bindEvents() {
     state.prefs.aiEnabled = !!el.aiAssistantToggle.checked;
     localStorage.setItem("sm_ai_enabled", state.prefs.aiEnabled ? "1" : "0");
     if (!state.prefs.aiEnabled) {
-      el.chatWidget.classList.remove("open");
+      closeChatWidget();
       el.chatToggle.style.opacity = "0.6";
     } else {
       el.chatToggle.style.opacity = "1";
+      el.chatToggle.removeAttribute("aria-hidden");
     }
   });
 
@@ -1238,12 +1239,12 @@ function bindEvents() {
       el.settingsStatus.textContent = "AI Assistant is disabled in Settings.";
       return;
     }
-    el.chatWidget.classList.add("open");
+    openChatWidget();
     el.chatInput.focus();
   });
 
   el.chatClose.addEventListener("click", () => {
-    el.chatWidget.classList.remove("open");
+    closeChatWidget();
   });
 
   el.chatForm.addEventListener("submit", async (event) => {
@@ -1263,7 +1264,7 @@ function bindEvents() {
         el.settingsStatus.textContent = "AI Assistant is disabled in Settings.";
         return;
       }
-      el.chatWidget.classList.add("open");
+      openChatWidget();
       await sendChat(button.dataset.q || "");
     });
   });
@@ -1317,6 +1318,18 @@ function closeSidebar() {
 
 function openSidebar() {
   document.body.classList.add("sidebar-open");
+}
+
+function openChatWidget() {
+  el.chatWidget.classList.add("open");
+  document.body.classList.add("chat-open");
+  el.chatToggle.setAttribute("aria-hidden", "true");
+}
+
+function closeChatWidget() {
+  el.chatWidget.classList.remove("open");
+  document.body.classList.remove("chat-open");
+  el.chatToggle.removeAttribute("aria-hidden");
 }
 
 async function refreshVisibleCharts() {
