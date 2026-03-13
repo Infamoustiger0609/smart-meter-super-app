@@ -1,9 +1,15 @@
-﻿export const appState = {
-  apiBase: localStorage.getItem("sm_api_base") || "http://127.0.0.1:8000",
+import { API_BASE } from "../config.js";
+
+const isLocalhost = window.location.hostname === "localhost";
+const savedApiBase = (localStorage.getItem("sm_api_base") || "").trim().replace(/\/$/, "");
+
+export const appState = {
+  apiBase: isLocalhost ? (savedApiBase || API_BASE) : API_BASE,
 };
 
 export function setApiBase(url) {
-  appState.apiBase = (url || "").trim().replace(/\/$/, "");
+  const normalized = (url || "").trim().replace(/\/$/, "");
+  appState.apiBase = isLocalhost ? (normalized || API_BASE) : API_BASE;
   localStorage.setItem("sm_api_base", appState.apiBase);
 }
 
@@ -29,4 +35,3 @@ export async function api(path, options = {}, token = "") {
 export function rs(value) {
   return Number(value || 0).toFixed(2);
 }
-

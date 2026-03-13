@@ -1,4 +1,4 @@
-﻿import { api, appState, rs, setApiBase } from "../services/api.js";
+import { api, appState, rs, setApiBase } from "../services/api.js";
 import { clearSession, requireRole } from "../services/auth.js";
 import { barConfig, doughnutConfig, renderChart } from "../services/charts.js";
 
@@ -32,16 +32,16 @@ const state = {
 };
 
 const pages = [
-  ["overview", "Energy Overview", "⚡"],
-  ["appliances", "Appliances", "🔌"],
-  ["billing", "Billing", "🧾"],
-  ["payments", "Payments", "💳"],
-  ["analytics", "Consumption Analytics", "📈"],
-  ["service", "Service Requests", "🛠"],
-  ["solar", "Solar Dashboard", "☀"],
-  ["calculator", "Energy Calculator", "🧮"],
-  ["help", "Help Center", "❓"],
-  ["settings", "Settings", "⚙"],
+  ["overview", "Energy Overview", "?"],
+  ["appliances", "Appliances", "??"],
+  ["billing", "Billing", "??"],
+  ["payments", "Payments", "??"],
+  ["analytics", "Consumption Analytics", "??"],
+  ["service", "Service Requests", "??"],
+  ["solar", "Solar Dashboard", "?"],
+  ["calculator", "Energy Calculator", "??"],
+  ["help", "Help Center", "?"],
+  ["settings", "Settings", "?"],
 ];
 
 const el = {
@@ -855,7 +855,7 @@ async function loadService() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn btn-outline";
-    btn.textContent = `${req.request_id} • ${req.request_type} • ${req.status}`;
+    btn.textContent = `${req.request_id} � ${req.request_type} � ${req.status}`;
     btn.addEventListener("click", async () => {
       const detail = await api(`/service/${req.request_id}`, {}, state.token);
       const lines = detail.data.timeline.map((item) => `- ${item.status} | ${new Date(item.at).toLocaleString()} | ${item.note}`);
@@ -933,13 +933,21 @@ function applyAutoRefresh() {
 }
 
 function bindEvents() {
-  el.apiBase.value = appState.apiBase;
-  el.settingsApiBase.value = appState.apiBase;
-  el.apiBase.addEventListener("change", () => {
-    setApiBase(el.apiBase.value);
-    el.settingsApiBase.value = appState.apiBase;
-    logEvent(`Backend URL changed to ${appState.apiBase}`);
-  });
+  const isLocalhost = window.location.hostname === "localhost";
+  el.apiBase.value = appState.apiBase || window.location.origin;
+  el.settingsApiBase.value = appState.apiBase || window.location.origin;
+
+  if (!isLocalhost) {
+    if (el.apiBase) el.apiBase.style.display = "none";
+    const apiSettingsGroup = el.settingsApiBase?.closest(".form-grid");
+    if (apiSettingsGroup) apiSettingsGroup.style.display = "none";
+  } else {
+    el.apiBase.addEventListener("change", () => {
+      setApiBase(el.apiBase.value);
+      el.settingsApiBase.value = appState.apiBase;
+      logEvent(`Backend URL changed to ${appState.apiBase}`);
+    });
+  }
 
   el.settingsBtn.addEventListener("click", () => switchPage("settings"));
 
@@ -1017,7 +1025,7 @@ function bindEvents() {
           payment_method: el.payMethod.value,
         }),
       }, state.token);
-      el.payMessage.textContent = `${res.data.payment_status} • ${res.data.transaction_id}`;
+      el.payMessage.textContent = `${res.data.payment_status} � ${res.data.transaction_id}`;
       logEvent("Payment processed");
       await Promise.all([loadPayments(), loadBilling(), loadOverview()]);
     } catch (err) {
@@ -1114,13 +1122,14 @@ function bindEvents() {
       logEvent(err.message, true);
     }
   });
-
-  el.applySettingsApi.addEventListener("click", () => {
-    setApiBase(el.settingsApiBase.value);
-    el.apiBase.value = appState.apiBase;
-    el.settingsStatus.textContent = `Backend URL applied: ${appState.apiBase}`;
-    logEvent(`Backend URL changed to ${appState.apiBase}`);
-  });
+  if (window.location.hostname === "localhost") {
+    el.applySettingsApi.addEventListener("click", () => {
+      setApiBase(el.settingsApiBase.value);
+      el.apiBase.value = appState.apiBase;
+      el.settingsStatus.textContent = `Backend URL applied: ${appState.apiBase}`;
+      logEvent(`Backend URL changed to ${appState.apiBase}`);
+    });
+  }
 
   el.darkModeToggle?.addEventListener("change", () => {
     state.prefs.darkMode = !!el.darkModeToggle.checked;
@@ -1204,7 +1213,7 @@ function bindEvents() {
     state.autoRefreshSeconds = 6;
     el.autoRefreshEnabled.checked = true;
     el.autoRefreshSeconds.value = "6";
-    el.settingsApiBase.value = "http://127.0.0.1:8000";
+    el.settingsApiBase.value = window.location.origin;
     setApiBase(el.settingsApiBase.value);
     el.apiBase.value = appState.apiBase;
     state.prefs = {
@@ -1334,4 +1343,8 @@ async function init() {
 }
 
 init().catch((err) => logEvent(err.message, true));
+
+
+
+
 

@@ -1,5 +1,7 @@
+const API_BASE = window.location.hostname === "localhost" ? window.location.origin.replace(/\/$/, "") : "";
+
 const state = {
-  apiBase: "http://127.0.0.1:8000",
+  apiBase: API_BASE,
   appliances: {}
 };
 
@@ -265,16 +267,24 @@ async function runAiRecommendation() {
 }
 
 function attachEvents() {
-  el.applyApiBase.addEventListener("click", async () => {
-    setButtonBusy(el.applyApiBase, true, "Applying...");
-    state.apiBase = el.apiBase.value.trim().replace(/\/$/, "");
-    logEvent(`Backend switched to ${state.apiBase}`);
-    try {
-      await initLoad();
-    } finally {
-      setButtonBusy(el.applyApiBase, false, "");
-    }
-  });
+  const isLocalhost = window.location.hostname === "localhost";
+  if (el.apiBase) {
+    el.apiBase.value = state.apiBase || window.location.origin;
+    if (!isLocalhost) el.apiBase.style.display = "none";
+  }
+  if (el.applyApiBase && !isLocalhost) el.applyApiBase.style.display = "none";
+  if (isLocalhost) {
+    el.applyApiBase.addEventListener("click", async () => {
+      setButtonBusy(el.applyApiBase, true, "Applying...");
+      state.apiBase = el.apiBase.value.trim().replace(/\/$/, "");
+      logEvent(`Backend switched to ${state.apiBase}`);
+      try {
+        await initLoad();
+      } finally {
+        setButtonBusy(el.applyApiBase, false, "");
+      }
+    });
+  }
 
   el.refreshAll.addEventListener("click", async () => {
     setButtonBusy(el.refreshAll, true, "Refreshing...");
@@ -305,3 +315,6 @@ initLoad();
 setInterval(() => {
   refreshOverview().catch(() => {});
 }, 6000);
+
+
+

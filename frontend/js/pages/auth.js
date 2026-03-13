@@ -1,4 +1,4 @@
-﻿import { api, appState, setApiBase } from "../services/api.js";
+import { api, appState, setApiBase } from "../services/api.js";
 import { clearSession, storeSession } from "../services/auth.js";
 
 const el = {
@@ -127,9 +127,15 @@ async function doRegister(event) {
 function init() {
   applyTheme();
   clearSession();
-  el.apiBase.value = appState.apiBase;
+  const isLocalhost = window.location.hostname === "localhost";
+  el.apiBase.value = appState.apiBase || window.location.origin;
 
-  el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
+  if (!isLocalhost) {
+    const apiRow = el.apiBase.closest(".form-row");
+    if (apiRow) apiRow.style.display = "none";
+  } else {
+    el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
+  }
   el.tabLogin.addEventListener("click", () => setMode("login"));
   el.tabRegister.addEventListener("click", () => setMode("register"));
   el.loginForm.addEventListener("submit", doLogin);
@@ -142,6 +148,7 @@ function init() {
   setMode("login");
   setNotice("Demo Consumer: user@demo.com / demo123 | Demo Admin: admin@demo.com / admin123");
 }
-
 init();
+
+
 

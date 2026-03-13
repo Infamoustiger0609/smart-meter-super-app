@@ -1,5 +1,7 @@
+import { API_BASE } from "../js/config.js";
+
 const state = {
-  apiBase: "http://127.0.0.1:8000",
+  apiBase: API_BASE,
   token: localStorage.getItem("superapp_token") || "",
   role: localStorage.getItem("superapp_role") || "",
   user: null,
@@ -373,10 +375,21 @@ async function refreshPage(pageId) {
 }
 
 function attachEvents() {
-  el.apiBase.addEventListener("change", () => {
-    state.apiBase = el.apiBase.value.trim().replace(/\/$/, "");
-    logEvent(`API base updated: ${state.apiBase}`);
-  });
+  const isLocalhost = window.location.hostname === "localhost";
+  if (el.apiBase) {
+    el.apiBase.value = state.apiBase || window.location.origin;
+    if (!isLocalhost) {
+      const apiLabel = document.querySelector("label[for='apiBase']");
+      if (apiLabel) apiLabel.style.display = "none";
+      el.apiBase.style.display = "none";
+    }
+  }
+  if (isLocalhost) {
+    el.apiBase.addEventListener("change", () => {
+      state.apiBase = el.apiBase.value.trim().replace(/\/$/, "");
+      logEvent(`API base updated: ${state.apiBase}`);
+    });
+  }
 
   el.refreshBtn.addEventListener("click", () => refreshPage().catch((e) => logEvent(e.message, true)));
 
@@ -525,3 +538,5 @@ setInterval(() => {
     loadDashboard().catch(() => {});
   }
 }, 6000);
+
+

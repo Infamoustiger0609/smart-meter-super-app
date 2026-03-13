@@ -584,9 +584,21 @@ function closeChartModal() {
 }
 
 function bindEvents() {
+  const isLocalhost = window.location.hostname === "localhost";
+
   if (el.apiBase) {
-    el.apiBase.value = appState.apiBase;
-    el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
+    el.apiBase.value = appState.apiBase || window.location.origin;
+    if (isLocalhost) {
+      el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
+    } else {
+      el.apiBase.style.display = "none";
+    }
+  }
+
+  if (!isLocalhost && el.adminSettingsApiBase) {
+    const apiLabel = document.querySelector("label[for='adminSettingsApiBase']");
+    if (apiLabel) apiLabel.style.display = "none";
+    el.adminSettingsApiBase.style.display = "none";
   }
 
   el.logoutBtn?.addEventListener("click", () => {
@@ -599,7 +611,9 @@ function bindEvents() {
   });
 
   el.adminSettingsSaveBtn?.addEventListener("click", async () => {
-    const nextApiBase = (el.adminSettingsApiBase?.value || "").trim() || appState.apiBase;
+    const nextApiBase = isLocalhost
+      ? ((el.adminSettingsApiBase?.value || "").trim() || appState.apiBase)
+      : appState.apiBase;
     const nextTheme = el.adminThemeMode?.value === "dark" ? "dark" : "light";
     const nextAccent = el.adminAccentTheme?.value || "blue";
     const nextAutoRefreshEnabled = !!el.adminAutoRefreshEnabled?.checked;
@@ -722,3 +736,4 @@ async function init() {
 }
 
 init();
+
