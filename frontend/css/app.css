@@ -85,7 +85,7 @@
   width: 1.25rem;
   min-width: 1.25rem;
   opacity: 0.9;
-  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+
 }
 
 .nav-label {
@@ -890,3 +890,13 @@ td {
     display: none;
   }
 }
+
+
+.nav-ico.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+

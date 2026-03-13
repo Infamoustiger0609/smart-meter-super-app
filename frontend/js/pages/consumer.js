@@ -32,16 +32,16 @@ const state = {
 };
 
 const pages = [
-  ["overview", "Energy Overview", "?"],
-  ["appliances", "Appliances", "??"],
-  ["billing", "Billing", "??"],
-  ["payments", "Payments", "??"],
-  ["analytics", "Consumption Analytics", "??"],
-  ["service", "Service Requests", "??"],
-  ["solar", "Solar Dashboard", "?"],
-  ["calculator", "Energy Calculator", "??"],
-  ["help", "Help Center", "?"],
-  ["settings", "Settings", "?"],
+  ["overview", "Energy Overview", "bolt"],
+  ["appliances", "Appliances", "power"],
+  ["billing", "Billing", "receipt_long"],
+  ["payments", "Payments", "payments"],
+  ["analytics", "Consumption Analytics", "insights"],
+  ["service", "Service Requests", "build"],
+  ["solar", "Solar Dashboard", "solar_power"],
+  ["calculator", "Energy Calculator", "calculate"],
+  ["help", "Help Center", "help"],
+  ["settings", "Settings", "settings"],
 ];
 
 const el = {
@@ -522,7 +522,7 @@ function buildNav() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.dataset.page = id;
-    btn.innerHTML = `<span class="nav-ico" aria-hidden="true">${icon}</span><span class="nav-label">${title}</span>`;
+    btn.innerHTML = `<span class="nav-ico material-icons" aria-hidden="true">${icon}</span><span class="nav-label">${title}</span>`;
     btn.addEventListener("click", () => switchPage(id));
     el.nav.appendChild(btn);
   });
@@ -1325,6 +1325,7 @@ async function init() {
 }
 
 init().catch((err) => logEvent(err.message, true));
+
 
 
 
