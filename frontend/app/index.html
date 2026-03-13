@@ -28,12 +28,17 @@
 
     <section class="content">
       <header class="topbar">
-        <div class="row">
+        <div class="row topbar-primary">
+          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Open menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <div class="status-dot"></div>
           <strong id="pageTitle">Energy Overview</strong>
           <span id="tariffBadge" class="badge normal">Tariff: --</span>
         </div>
-        <div class="row">
+        <div class="row topbar-actions">
           <small id="lastSync">Last sync: --</small>
           <button id="settingsBtn" class="btn btn-outline" type="button">Settings</button>
           <button id="refreshBtn" class="btn" type="button">Refresh</button>
@@ -49,7 +54,7 @@
                 <span>Carbon Footprint</span>
                 <span
                   class="carbon-icon"
-                  title="Carbon emissions are calculated as Electricity Usage (kWh) × 0.82 kg CO2 per kWh."
+                  title="Carbon emissions are calculated as Electricity Usage (kWh) ï¿½ 0.82 kg CO2 per kWh."
                   aria-label="Carbon emissions formula"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -413,6 +418,7 @@ Support: support@intellismart.demo
       </main>
     </section>
   </div>
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
   <button id="chatToggle" class="chat-toggle" type="button" aria-label="Open support assistant">
     <span class="chat-toggle-icon">AI</span>

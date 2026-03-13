@@ -18,6 +18,8 @@ const state = {
   autoRefreshTimer: null,
 };
 
+const MOBILE_WIDTH = 768;
+
 const pages = [
   ["dashboard", "Admin Dashboard", "&#127968;"],
   ["users", "User Management", "&#128101;"],
@@ -96,6 +98,9 @@ const el = {
   adminSettingsResetBtn: document.getElementById("adminSettingsResetBtn"),
   adminSettingsStatus: document.getElementById("adminSettingsStatus"),
   adminAppInfo: document.getElementById("adminAppInfo"),
+  sidebar: document.querySelector(".sidebar"),
+  sidebarToggle: document.getElementById("sidebarToggle"),
+  sidebarBackdrop: document.getElementById("sidebarBackdrop"),
 };
 
 let adminCache = {
@@ -178,7 +183,10 @@ function buildNav() {
     button.type = "button";
     button.dataset.page = id;
     button.innerHTML = `<span class="nav-ico">${icon}</span><span class="nav-label">${title}</span>`;
-    button.addEventListener("click", () => switchPage(id));
+    button.addEventListener("click", () => {
+      switchPage(id);
+      if (window.innerWidth < MOBILE_WIDTH) closeSidebar();
+    });
     el.nav.appendChild(button);
   });
 }
@@ -583,6 +591,14 @@ function closeChartModal() {
   el.chartModal?.setAttribute("aria-hidden", "true");
 }
 
+function closeSidebar() {
+  document.body.classList.remove("sidebar-open");
+}
+
+function openSidebar() {
+  document.body.classList.add("sidebar-open");
+}
+
 function bindEvents() {
   if (el.apiBase) {
     el.apiBase.value = appState.apiBase || window.location.origin;
@@ -594,6 +610,21 @@ function bindEvents() {
     if (apiLabel) apiLabel.style.display = "none";
     el.adminSettingsApiBase.style.display = "none";
   }
+
+  el.sidebarToggle?.addEventListener("click", () => {
+    if (document.body.classList.contains("sidebar-open")) closeSidebar();
+    else openSidebar();
+  });
+
+  el.sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeSidebar();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth >= MOBILE_WIDTH) closeSidebar();
+  });
 
   el.logoutBtn?.addEventListener("click", () => {
     clearSession();

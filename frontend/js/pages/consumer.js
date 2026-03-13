@@ -147,6 +147,9 @@ const el = {
   chatInput: document.getElementById("chatInput"),
   chatTyping: document.getElementById("chatTyping"),
   chatQuickActions: document.getElementById("chatQuickActions"),
+  sidebar: document.querySelector(".sidebar"),
+  sidebarToggle: document.getElementById("sidebarToggle"),
+  sidebarBackdrop: document.getElementById("sidebarBackdrop"),
 };
 
 const DEVICE_ICONS = {
@@ -171,6 +174,7 @@ const TYPICAL_HOUSEHOLD_KWH_PER_HOUR = 1.8;
 const TYPICAL_EMISSION_RATE = TYPICAL_HOUSEHOLD_KWH_PER_HOUR * CO2_PER_KWH;
 const SAVINGS_FULL_SCALE_RATIO = 0.4;
 const metricAnimations = new WeakMap();
+const MOBILE_WIDTH = 768;
 
 function logEvent(message, isError = false) {
   const li = document.createElement("li");
@@ -523,7 +527,10 @@ function buildNav() {
     btn.type = "button";
     btn.dataset.page = id;
     btn.innerHTML = `<span class="nav-ico material-icons" aria-hidden="true">${icon}</span><span class="nav-label">${title}</span>`;
-    btn.addEventListener("click", () => switchPage(id));
+    btn.addEventListener("click", () => {
+      switchPage(id);
+      if (window.innerWidth < MOBILE_WIDTH) closeSidebar();
+    });
     el.nav.appendChild(btn);
   });
 }
@@ -855,7 +862,7 @@ async function loadService() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn btn-outline";
-    btn.textContent = `${req.request_id} • ${req.request_type} • ${req.status}`;
+    btn.textContent = `${req.request_id} ï¿½ ${req.request_type} ï¿½ ${req.status}`;
     btn.addEventListener("click", async () => {
       const detail = await api(`/service/${req.request_id}`, {}, state.token);
       const lines = detail.data.timeline.map((item) => `- ${item.status} | ${new Date(item.at).toLocaleString()} | ${item.note}`);
@@ -1016,7 +1023,7 @@ function bindEvents() {
           payment_method: el.payMethod.value,
         }),
       }, state.token);
-      el.payMessage.textContent = `${res.data.payment_status} • ${res.data.transaction_id}`;
+      el.payMessage.textContent = `${res.data.payment_status} ï¿½ ${res.data.transaction_id}`;
       logEvent("Payment processed");
       await Promise.all([loadPayments(), loadBilling(), loadOverview()]);
     } catch (err) {
@@ -1260,6 +1267,20 @@ function bindEvents() {
       await sendChat(button.dataset.q || "");
     });
   });
+  el.sidebarToggle?.addEventListener("click", () => {
+    if (document.body.classList.contains("sidebar-open")) closeSidebar();
+    else openSidebar();
+  });
+
+  el.sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeSidebar();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth >= MOBILE_WIDTH) closeSidebar();
+  });
 }
 
 function applyTheme() {
@@ -1288,6 +1309,14 @@ function applySettingsUI() {
   el.aiStyleSelect.value = state.prefs.aiStyle;
   el.defaultApplianceBehavior.value = state.prefs.defaultApplianceBehavior;
   el.profileVisibility.value = state.prefs.profileVisibility;
+}
+
+function closeSidebar() {
+  document.body.classList.remove("sidebar-open");
+}
+
+function openSidebar() {
+  document.body.classList.add("sidebar-open");
 }
 
 async function refreshVisibleCharts() {

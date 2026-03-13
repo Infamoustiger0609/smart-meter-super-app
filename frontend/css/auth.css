@@ -128,3 +128,65 @@ body {
   }
 }
 
+/* Responsive login improvements */
+html,
+body {
+  overflow-x: hidden;
+}
+
+.auth-panel {
+  min-height: 100vh;
+}
+
+#loginBtn,
+#registerBtn,
+.form .btn {
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 1.5rem 1.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    display: none;
+  }
+
+  .auth-panel {
+    min-height: 100dvh;
+    padding: 1rem;
+    display: grid;
+    place-items: center;
+  }
+
+  .auth-card {
+    width: min(440px, 100%);
+    padding: 0.92rem;
+    border-radius: 16px;
+  }
+
+  .tabs {
+    margin-bottom: 0.65rem;
+  }
+
+  .form {
+    gap: 0.56rem;
+  }
+
+  .form-row {
+    gap: 0.32rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+  }
+}

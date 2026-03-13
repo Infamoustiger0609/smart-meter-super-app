@@ -27,13 +27,18 @@
 
     <section class="content">
       <header class="topbar">
-        <div class="row">
+        <div class="row topbar-primary">
+          <button id="sidebarToggle" class="sidebar-toggle" type="button" aria-label="Open menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <strong id="pageTitle">Admin Dashboard</strong>
           <span id="sysStatus" class="badge off-peak">System: --</span>
           <span id="gridHealth" class="badge normal">Grid Health: --</span>
           <span id="activeMetersIndicator" class="badge normal">Active Meters: --</span>
         </div>
-        <div class="row">
+        <div class="row topbar-actions">
           <small id="lastSync">Last sync: --</small>
           <button id="refreshBtn" class="btn" type="button">Refresh</button>
         </div>
@@ -261,6 +266,7 @@
       </main>
     </section>
   </div>
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
   <div id="chartModal" class="modal" aria-hidden="true">
     <div class="modal-card">

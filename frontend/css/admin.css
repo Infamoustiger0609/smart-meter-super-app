@@ -403,3 +403,198 @@ td .status-pill {
     grid-template-columns: 1fr;
   }
 }
+/* Responsive layout upgrades */
+html,
+body {
+  overflow-x: hidden;
+}
+
+.shell,
+.content,
+.main,
+.page,
+.card {
+  min-width: 0;
+}
+
+.sidebar-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-card);
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.sidebar-toggle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 14, 26, 0.48);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 2100;
+}
+
+.kpi-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.panel-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.card,
+.kpi {
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+.card:hover,
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.table-wrap,
+.table-container,
+.mini-table-wrap {
+  overflow-x: auto;
+}
+
+.card canvas,
+.modal-chart canvas {
+  max-width: 100%;
+}
+
+@media (min-width: 768px) and (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .toolbar,
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    height: 100dvh;
+    min-height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 2200;
+    box-shadow: var(--shadow-md);
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  body.sidebar-open .sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .topbar {
+    padding: 0.72rem 0.8rem;
+    align-items: flex-start;
+  }
+
+  .topbar-primary {
+    width: 100%;
+    gap: 0.48rem;
+  }
+
+  .topbar-primary strong,
+  #pageTitle {
+    font-size: 1rem;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  #lastSync {
+    font-size: 0.72rem;
+    opacity: 0.9;
+  }
+
+  #refreshBtn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    font-size: 0;
+    border-radius: 10px;
+  }
+
+  #refreshBtn::before {
+    content: "↻";
+    font-size: 1rem;
+  }
+
+  .main {
+    padding: 0.75rem;
+    gap: 14px;
+    overflow-x: hidden;
+  }
+
+  .kpi-grid,
+  .panel-grid,
+  .toolbar,
+  .form-grid,
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    overflow-x: auto;
+  }
+
+  .card canvas {
+    min-width: 320px;
+  }
+
+  th,
+  td {
+    font-size: 0.84rem;
+  }
+}
