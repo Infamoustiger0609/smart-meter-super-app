@@ -1,4 +1,4 @@
-﻿from typing import Optional
+from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -42,7 +42,8 @@ logger = logging.getLogger("superapp")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 
 
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 INDEX_FILE = FRONTEND_DIR / "index.html"
 
 if FRONTEND_DIR.exists():
@@ -477,3 +478,10 @@ app.include_router(admin_router)
 app.include_router(chat_router)
 
 
+
+@app.get("/{full_path:path}")
+async def serve_frontend_catchall(full_path: str):
+    index_file = FRONTEND_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"status": "frontend missing"}
