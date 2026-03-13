@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electricity Super App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <h1>Electricity Super App</h1>
+      <p class="small">IntelliSmart Demo Console</p>
+      <label for="apiBase">Backend URL</label>
+      <input id="apiBase" value="http://127.0.0.1:8000" />
+
+      <nav class="nav" id="nav"></nav>
+
+      <div class="auth-mini">
+        <div id="authStatus">Not logged in</div>
+        <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="row">
+          <button class="btn" id="refreshBtn">Refresh</button>
+        </div>
+      </header>
+
+      <section id="page-dashboard" class="page active">
+        <div class="card-grid kpi-grid">
+          <article class="card"><span>Live Load</span><strong id="kpiLoad">--</strong><small>kWh/h</small></article>
+          <article class="card"><span>Current Tariff</span><strong id="kpiTariff">--</strong><small>Rs/kWh</small></article>
+          <article class="card"><span>Cost Burn</span><strong id="kpiCost">--</strong><small>Rs/h</small></article>
+          <article class="card"><span>Savings Potential</span><strong id="kpiSavings">--</strong><small>Rs/h</small></article>
+        </div>
+        <div class="card">
+          <h3>AI Advisor</h3>
+          <button class="btn" id="runAi">Generate Recommendation</button>
+          <p id="aiText" class="result">No recommendation yet.</p>
+        </div>
+      </section>
+
+      <section id="page-appliances" class="page">
+        <div class="card">
+          <h3>Appliance Control</h3>
+          <div id="applianceList" class="stack"></div>
+        </div>
+        <div class="card">
+          <h3>Schedule Automation</h3>
+          <form id="scheduleForm" class="row row-wrap">
+            <select id="scheduleDevice"></select>
+            <input id="scheduleTime" type="time" required />
+            <button class="btn" type="submit">Add Schedule</button>
+          </form>
+          <ul id="scheduleList"></ul>
+        </div>
+      </section>
+
+      <section id="page-billing" class="page">
+        <div class="card">
+          <h3>Current Bill</h3>
+          <div id="currentBill"></div>
+        </div>
+        <div class="card">
+          <h3>Bill History</h3>
+          <table>
+            <thead><tr><th>Month</th><th>Units</th><th>Amount</th><th>Status</th><th>PDF</th><th>Action</th></tr></thead>
+            <tbody id="billHistory"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="page-payments" class="page">
+        <div class="card">
+          <h3>Pay Bill</h3>
+          <form id="payForm" class="row row-wrap">
+            <input id="payBillId" placeholder="Bill ID" required />
+            <input id="payAmount" type="number" step="0.01" placeholder="Amount" required />
+            <select id="payMethod"><option>UPI</option><option>CARD</option><option>NET_BANKING</option></select>
+            <button class="btn" type="submit">Pay</button>
+          </form>
+          <p id="payMsg" class="result"></p>
+        </div>
+        <div class="card">
+          <h3>Payment History</h3>
+          <table>
+            <thead><tr><th>Txn</th><th>Bill</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="paymentHistory"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="page-analytics" class="page">
+        <div class="card"><h3>Hourly Usage</h3><canvas id="chartDaily"></canvas></div>
+        <div class="card"><h3>Daily Usage (Last 30 Days)</h3><canvas id="chartMonthly"></canvas></div>
+        <div class="card"><h3>Monthly Usage</h3><canvas id="chartYearly"></canvas></div>
+      </section>
+
+      <section id="page-service" class="page">
+        <div class="card">
+          <h3>Create Service Request</h3>
+          <form id="serviceForm" class="stack">
+            <select id="serviceType">
+              <option>meter malfunction</option>
+              <option>billing dispute</option>
+              <option>outage report</option>
+              <option>installation request</option>
+            </select>
+            <textarea id="serviceDesc" placeholder="Describe your issue"></textarea>
+            <button class="btn" type="submit">Submit Request</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>Request History</h3>
+          <ul id="serviceHistory"></ul>
+          <div id="serviceDetail" class="result"></div>
+        </div>
+      </section>
+
+      <section id="page-solar" class="page">
+        <div class="card"><h3>Solar Production</h3><div id="solarSummary"></div><canvas id="chartSolar"></canvas></div>
+        <div class="card"><h3>Net Metering</h3><div id="solarNet"></div></div>
+      </section>
+
+      <section id="page-calculator" class="page">
+        <div class="card">
+          <h3>Energy Consumption Calculator</h3>
+          <form id="calcForm" class="row row-wrap">
+            <input id="calcType" placeholder="Appliance type" required />
+            <input id="calcPower" type="number" placeholder="Power (watts)" required />
+            <input id="calcHours" type="number" step="0.1" placeholder="Hours/day" required />
+            <button class="btn" type="submit">Calculate</button>
+          </form>
+          <p id="calcResult" class="result"></p>
+        </div>
+      </section>
+
+      <section id="page-help" class="page">
+        <div class="card"><h3>FAQs</h3><ul id="faqList"></ul></div>
+        <div class="card">
+          <h3>Contact Support</h3>
+          <form id="helpForm" class="stack">
+            <input id="helpSubject" placeholder="Subject" required />
+            <textarea id="helpMessage" placeholder="Message" required></textarea>
+            <button class="btn" type="submit">Send</button>
+          </form>
+          <p id="helpResult" class="result"></p>
+        </div>
+      </section>
+
+      <section id="page-settings" class="page">
+        <div class="card">
+          <h3>Register</h3>
+          <form id="registerForm" class="row row-wrap">
+            <input id="regName" placeholder="Full Name" required />
+            <input id="regEmail" type="email" placeholder="Email" required />
+            <input id="regMeter" placeholder="Smart Meter ID" required />
+            <input id="regPassword" type="password" placeholder="Password" required />
+            <button class="btn" type="submit">Register</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>Login</h3>
+          <form id="loginForm" class="row row-wrap">
+            <input id="loginEmail" type="email" placeholder="Email" required />
+            <input id="loginPassword" type="password" placeholder="Password" required />
+            <button class="btn" type="submit">Login</button>
+          </form>
+          <div class="result" id="profile"></div>
+        </div>
+        <div class="card">
+          <h3>Subscription</h3>
+          <div id="plans"></div>
+          <div id="subStatus" class="result"></div>
+        </div>
+      </section>
+
+      <section id="page-admin" class="page">
+        <div class="card-grid">
+          <div class="card"><h3>Admin Summary</h3><div id="adminSummary"></div></div>
+          <div class="card"><h3>User Management</h3><ul id="adminUsers"></ul></div>
+          <div class="card"><h3>Service Requests</h3><ul id="adminRequests"></ul></div>
+          <div class="card">
+            <h3>Update Request</h3>
+            <form id="adminReqForm" class="row row-wrap">
+              <input id="adminReqId" placeholder="Request ID" required />
+              <select id="adminReqStatus"><option>OPEN</option><option>IN_PROGRESS</option><option>RESOLVED</option><option>CLOSED</option></select>
+              <input id="adminReqNote" placeholder="Note" required />
+              <button class="btn" type="submit">Update</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Activity Log</h3>
+        <ul id="events"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

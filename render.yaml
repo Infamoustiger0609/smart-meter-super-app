@@ -1,0 +1,26 @@
+﻿services:
+  - type: web
+    name: smart-meter-super-app-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: AI_MODE
+        value: cloud
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: OLLAMA_URL
+        value: http://localhost:11434
+      - key: GROQ_API_KEY
+        sync: false
+
+staticSites:
+  - name: smart-meter-super-app-frontend
+    rootDir: frontend
+    publishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

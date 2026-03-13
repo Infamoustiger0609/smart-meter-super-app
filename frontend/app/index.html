@@ -1,0 +1,443 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consumer App | SMART METER SUPER APP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/app.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h2>Consumer Console</h2>
+        <p>SMART METER SUPER APP</p>
+        <input id="apiBase" type="text" value="http://127.0.0.1:8000" />
+      </div>
+      <nav id="nav" class="nav"></nav>
+      <div class="stack">
+        <div id="whoami" class="badge normal">Loading profile...</div>
+        <button id="logoutBtn" class="btn btn-outline" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <header class="topbar">
+        <div class="row">
+          <div class="status-dot"></div>
+          <strong id="pageTitle">Energy Overview</strong>
+          <span id="tariffBadge" class="badge normal">Tariff: --</span>
+        </div>
+        <div class="row">
+          <small id="lastSync">Last sync: --</small>
+          <button id="settingsBtn" class="btn btn-outline" type="button">Settings</button>
+          <button id="refreshBtn" class="btn" type="button">Refresh</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <section id="overview" class="page active fade-in">
+          <div class="kpi-grid">
+            <article class="kpi"><span>Live Load</span><strong id="kpiLoad">--</strong><small>kWh/h</small></article>
+            <article class="kpi kpi-carbon">
+              <div class="row" style="justify-content:space-between;align-items:center">
+                <span>Carbon Footprint</span>
+                <span
+                  class="carbon-icon"
+                  title="Carbon emissions are calculated as Electricity Usage (kWh) × 0.82 kg CO2 per kWh."
+                  aria-label="Carbon emissions formula"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M20.6 3.8C15.2 4.1 11 6.5 8.5 10.2c-2 3-2.3 6.3-1.1 9.2a.9.9 0 0 0 1 .6c3.1-.4 5.8-1.8 7.7-4.1 2.4-2.8 3.1-6.7 2.2-11.8a.9.9 0 0 0-.9-.7h-.1c-.3 0-.5.2-.7.4l-2.4 3.3a.9.9 0 1 0 1.4 1L17.3 6c.4 3.6-.2 6.3-1.9 8.3-1.4 1.6-3.2 2.7-5.4 3.2-.5-2.1-.1-4.2 1.1-6 2.2-3.2 5.9-5.2 10-5.5a.9.9 0 0 0-.1-1.8z"/>
+                  </svg>
+                </span>
+              </div>
+              <div id="carbonGauge" class="carbon-gauge" role="img" aria-label="Carbon emission intensity gauge">
+                <div class="carbon-gauge-center">
+                  <strong id="kpiCarbonRate">--</strong>
+                  <small>kg CO2/hr</small>
+                </div>
+              </div>
+              <div class="carbon-stats">
+                <div><span>Total Today</span><strong id="kpiCarbonToday">--</strong><small>kg CO2</small></div>
+                <div><span>Est. Monthly</span><strong id="kpiCarbonMonth">--</strong><small>kg CO2</small></div>
+              </div>
+              <small id="kpiCarbonIntensity" class="kpi-note">Intensity: --</small>
+            </article>
+            <article class="kpi"><span>Cost Burn</span><strong id="kpiCost">--</strong><small>Rs/h</small></article>
+            <article class="kpi kpi-savings">
+              <span>Savings Potential</span>
+              <div class="savings-layout">
+                <div id="savingsGauge" class="savings-gauge" role="img" aria-label="Savings potential radial indicator">
+                  <div class="savings-gauge-center">
+                    <strong id="kpiSavings">--</strong>
+                    <small>Rs/h</small>
+                  </div>
+                </div>
+                <div class="stack" style="gap:0.2rem">
+                  <small>Saved vs current burn</small>
+                  <strong id="kpiSavingsPct">--%</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+          <article id="energyBalanceCard" class="card stack">
+            <div class="row" style="justify-content:space-between;align-items:flex-start;gap:1rem">
+              <div class="stack" style="gap:0.22rem">
+                <h3 style="margin:0">Energy Balance</h3>
+                <small id="balanceMeterType" class="badge normal">Meter: --</small>
+              </div>
+              <div class="row" style="gap:0.5rem;flex-wrap:wrap">
+                <button id="balanceActionBtn" class="btn" type="button">Recharge / Pay Bill</button>
+                <button id="balanceForecastBtn" class="btn btn-outline" type="button">Forecast</button>
+              </div>
+            </div>
+            <div class="kpi-grid">
+              <article class="kpi"><span>Current Balance</span><strong id="balanceCurrent">--</strong><small>Rs</small></article>
+              <article class="kpi"><span>Estimated Daily Cost</span><strong id="balanceDaily">--</strong><small>Rs/day</small></article>
+              <article class="kpi"><span>Days Remaining</span><strong id="balanceDays">--</strong><small>days</small></article>
+              <article class="kpi"><span>Next Bill Prediction</span><strong id="balanceNextBill">--</strong><small>Rs</small></article>
+            </div>
+            <p id="balanceInsight" class="result">Loading balance status...</p>
+          </article>
+          <div class="panel-grid">
+            <article class="card stack">
+              <div class="row" style="justify-content:space-between"><h3>AI Optimization Advisor</h3><button id="runAi" class="btn" type="button">Generate</button></div>
+              <p id="aiText" class="result">No recommendation yet.</p>
+            </article>
+            <article class="card stack">
+              <h3>Subscription Status</h3>
+              <p id="subStatus" class="result skeleton"></p>
+              <div id="planActions" class="stack"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="appliances" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Appliance Controls</h3>
+              <div id="applianceList" class="appliance-grid"></div>
+            </article>
+            <article class="card schedule-compact">
+              <h3>Schedule Automation</h3>
+              <form id="scheduleForm" class="schedule-form-row">
+                <select id="scheduleDevice" required aria-label="Appliance"></select>
+                <input id="scheduleTime" type="time" required aria-label="Run time" />
+                <select id="scheduleRepeat" aria-label="Repeat">
+                  <option value="daily">Daily</option>
+                  <option value="weekdays">Weekdays</option>
+                  <option value="weekends">Weekends</option>
+                  <option value="once">Once</option>
+                </select>
+                <button class="btn" type="submit">Schedule</button>
+              </form>
+              <ul id="scheduleList" class="schedule-list"></ul>
+            </article>
+            <article class="card stack">
+              <h3>Appliance Energy Distribution</h3>
+              <canvas id="chartApplianceMix"></canvas>
+              <p id="applianceMixSummary" class="result">Loading appliance energy distribution...</p>
+            </article>
+          </div>
+          <article class="card stack">
+            <h3>Tariff Simulation</h3>
+            <form id="simulateTimeForm" class="form-grid">
+              <input id="simulateTime" type="time" required />
+              <button class="btn" type="submit">Set Simulated Time</button>
+            </form>
+            <p id="simulateMsg" class="result"></p>
+            <form id="whatIfForm" class="stack">
+              <div id="whatIfDevices" class="row" style="flex-wrap:wrap"></div>
+              <div class="form-grid">
+                <input id="whatIfTime" type="time" required />
+                <button class="btn" type="submit">Run What-If</button>
+              </div>
+            </form>
+            <pre id="whatIfResult" class="result">Run a what-if scenario to compare savings and CO2 impact.</pre>
+          </article>
+        </section>
+
+        <section id="billing" class="page">
+          <div class="panel-grid">
+            <article class="card stack"><h3>Current Bill</h3><div id="currentBill" class="result skeleton"></div></article>
+            <article class="card stack"><h3>Monthly Estimate</h3>
+              <form id="billingEstimateForm" class="form-grid">
+                <input id="billingUnits" type="number" min="0" step="0.1" placeholder="Optional monthly kWh" />
+                <button class="btn" type="submit">Estimate</button>
+              </form>
+              <div id="billingEstimate" class="result"></div>
+            </article>
+          </div>
+          <article class="card stack">
+            <h3>Bill History</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Month</th><th>Units</th><th>Amount</th><th>Status</th><th>PDF</th><th>Action</th></tr></thead>
+                <tbody id="billHistory"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="payments" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Pay Electricity Bill</h3>
+              <form id="payForm" class="form-grid">
+                <input id="payBillId" required placeholder="Bill ID" />
+                <input id="payAmount" required type="number" min="0" step="0.01" placeholder="Amount" />
+                <select id="payMethod"><option>UPI</option><option>CARD</option><option>NET_BANKING</option></select>
+                <button class="btn" type="submit">Pay</button>
+              </form>
+              <p id="payMessage" class="result"></p>
+            </article>
+            <article class="card stack">
+              <h3>Payment History</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Date</th><th>Txn ID</th><th>Bill</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+                  <tbody id="paymentHistory"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="analytics" class="page">
+          <div class="panel-grid">
+            <article class="card"><h3>Hourly Usage (Today)</h3><canvas id="chartDaily"></canvas></article>
+            <article class="card"><h3>Daily Usage (30 Days)</h3><canvas id="chartMonthly"></canvas></article>
+            <article class="card"><h3>Monthly Usage</h3><canvas id="chartYearly"></canvas></article>
+          </div>
+        </section>
+
+        <section id="service" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Raise Service Request</h3>
+              <form id="serviceForm" class="stack">
+                <select id="serviceType">
+                  <option>meter malfunction</option>
+                  <option>billing dispute</option>
+                  <option>outage report</option>
+                  <option>installation request</option>
+                </select>
+                <textarea id="serviceDesc" required placeholder="Describe issue"></textarea>
+                <button class="btn" type="submit">Submit Request</button>
+              </form>
+            </article>
+            <article class="card stack">
+              <h3>Request Tracking</h3>
+              <ul id="serviceHistory" class="list"></ul>
+              <pre id="serviceTimeline" class="result">Select a request to view timeline.</pre>
+            </article>
+          </div>
+        </section>
+
+        <section id="solar" class="page">
+          <div class="panel-grid">
+            <article class="card stack"><h3>Solar Production</h3><div id="solarSummary" class="result"></div><canvas id="chartSolar"></canvas></article>
+            <article class="card stack"><h3>Solar Contribution</h3><canvas id="chartSolarContribution"></canvas><div id="solarNet" class="result"></div></article>
+          </div>
+        </section>
+
+        <section id="calculator" class="page">
+          <article class="card stack">
+            <h3>Energy Consumption Calculator</h3>
+            <form id="calcForm" class="form-grid">
+              <input id="calcType" required placeholder="Appliance type" />
+              <input id="calcPower" required type="number" min="1" step="0.1" placeholder="Power (W)" />
+              <input id="calcHours" required type="number" min="0.1" max="24" step="0.1" placeholder="Usage hrs/day" />
+              <button class="btn" type="submit">Calculate</button>
+            </form>
+            <pre id="calcResult" class="result"></pre>
+          </article>
+        </section>
+
+        <section id="help" class="page">
+          <div class="panel-grid">
+            <article class="card stack"><h3>FAQs</h3><ul id="faqList" class="list"></ul></article>
+            <article class="card stack">
+              <h3>Contact Support</h3>
+              <form id="helpForm" class="stack">
+                <input id="helpSubject" required placeholder="Subject" />
+                <textarea id="helpMessage" required placeholder="Write your message"></textarea>
+                <button class="btn" type="submit">Send</button>
+              </form>
+              <p id="helpResult" class="result"></p>
+            </article>
+          </div>
+        </section>
+
+        <section id="settings" class="page">
+          <article class="card stack grad-card">
+            <h3>Web App Settings & Preferences</h3>
+            <div class="settings-grid">
+              <section class="settings-group">
+                <strong>Theme & Appearance</strong>
+                <div class="switch-row">
+                  <span>Dark Mode</span>
+                  <label class="toggle-switch">
+                    <input id="darkModeToggle" type="checkbox" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="switch-row">
+                  <span>Accent Theme</span>
+                  <select id="accentTheme" class="select-inline">
+                    <option value="blue">Blue / Teal</option>
+                    <option value="violet">Violet / Cyan</option>
+                    <option value="emerald">Emerald / Aqua</option>
+                  </select>
+                </div>
+                <div class="switch-row">
+                  <span>Language</span>
+                  <select id="languageSelect" class="select-inline">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                  </select>
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <strong>Alerts & Notifications</strong>
+                <div class="switch-row">
+                  <span>Push Notifications</span>
+                  <label class="toggle-switch">
+                    <input id="notifToggle" type="checkbox" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="switch-row">
+                  <span>Energy Alerts</span>
+                  <label class="toggle-switch">
+                    <input id="energyAlertToggle" type="checkbox" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="switch-row">
+                  <span>High Usage Threshold</span>
+                  <input id="energyAlertThreshold" type="number" min="1" value="18" class="select-inline" />
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <strong>AI Assistant</strong>
+                <div class="switch-row">
+                  <span>Assistant Enabled</span>
+                  <label class="toggle-switch">
+                    <input id="aiAssistantToggle" type="checkbox" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="switch-row">
+                  <span>Response Style</span>
+                  <select id="aiStyleSelect" class="select-inline">
+                    <option value="concise">Concise</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="detailed">Detailed</option>
+                  </select>
+                </div>
+                <div class="ai-options">
+                  <button type="button" data-q="How can I reduce energy usage?">Energy Tips</button>
+                  <button type="button" data-q="What is my current bill?">Bill Summary</button>
+                  <button type="button" data-q="How long will my balance last?">Balance Forecast</button>
+                </div>
+              </section>
+
+              <section class="settings-group">
+                <strong>App & Meter</strong>
+                <div class="form-grid">
+                  <input id="settingsApiBase" type="text" placeholder="Backend URL" />
+                  <button id="applySettingsApi" class="btn" type="button">Apply API URL</button>
+                </div>
+                <div class="switch-row">
+                  <span>Auto refresh enabled</span>
+                  <label class="toggle-switch">
+                    <input id="autoRefreshEnabled" type="checkbox" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="switch-row">
+                  <span>Refresh interval (sec)</span>
+                  <input id="autoRefreshSeconds" type="number" min="3" step="1" value="6" class="select-inline" />
+                </div>
+                <button id="applyRefreshSettings" class="btn btn-outline" type="button">Apply Refresh</button>
+              </section>
+
+              <section class="settings-group">
+                <strong>Account Preferences</strong>
+                <div class="switch-row">
+                  <span>Default appliance state on login</span>
+                  <select id="defaultApplianceBehavior" class="select-inline">
+                    <option value="retain">Retain last known</option>
+                    <option value="off">All OFF (except essential)</option>
+                  </select>
+                </div>
+                <div class="switch-row">
+                  <span>Profile visibility</span>
+                  <select id="profileVisibility" class="select-inline">
+                    <option value="private">Private</option>
+                    <option value="shared">Shared with utility</option>
+                  </select>
+                </div>
+                <div class="row" style="flex-wrap:wrap">
+                  <button id="clearLogsBtn" class="btn btn-outline" type="button">Clear Activity Log</button>
+                  <button id="resetSettingsBtn" class="btn btn-outline" type="button">Reset Defaults</button>
+                </div>
+              </section>
+            </div>
+            <div class="settings-group">
+              <strong>About SMART METER SUPER APP</strong>
+              <div id="appInfo" class="result">
+Version: 1.4.0 (Demo Build)
+System status: Connected
+Support: support@intellismart.demo
+              </div>
+            </div>
+            <p id="settingsStatus" class="result"></p>
+          </article>
+        </section>
+
+        <article class="card stack">
+          <h3>Activity Log</h3>
+          <ul id="events" class="list"></ul>
+        </article>
+      </main>
+    </section>
+  </div>
+
+  <button id="chatToggle" class="chat-toggle" type="button" aria-label="Open support assistant">
+    <span class="chat-toggle-icon">AI</span>
+    <span class="chat-toggle-label">Energy AI Chatbot</span>
+  </button>
+  <section id="chatWidget" class="chat-widget" aria-live="polite">
+    <header class="chat-header">
+      <strong>Energy Assistant</strong>
+      <button id="chatClose" class="btn btn-outline" type="button">Close</button>
+    </header>
+    <div id="chatQuickActions" class="chat-quick-actions">
+      <button type="button" data-q="Check my bill this month">Check my bill</button>
+      <button type="button" data-q="How long will my balance last?">Balance forecast</button>
+      <button type="button" data-q="How can I reduce energy usage?">Reduce energy usage</button>
+      <button type="button" data-q="What are peak tariff hours?">Tariff information</button>
+      <button type="button" data-q="How do I report a service issue?">Report an issue</button>
+    </div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <div id="chatTyping" class="chat-typing" style="display:none">Assistant is typing...</div>
+    <form id="chatForm" class="chat-form">
+      <input id="chatInput" type="text" maxlength="800" placeholder="Ask about bills, tariffs, appliances, solar..." />
+      <button class="btn" type="submit">Send</button>
+    </form>
+  </section>
+
+  <script type="module" src="../js/pages/consumer.js"></script>
+</body>
+</html>
+

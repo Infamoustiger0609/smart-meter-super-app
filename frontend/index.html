@@ -1,0 +1,97 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMART METER SUPER APP | Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/auth.css" />
+</head>
+<body>
+  <div class="auth-layout">
+    <section class="hero fade-in">
+      <div>
+        <p class="badge normal">Nationwide Smart Meter Experience</p>
+        <h1>Energy intelligence for every home and utility team.</h1>
+        <p>
+          Monitor usage, automate appliances, pay bills, resolve service issues, and optimize tariff decisions through a single modern platform.
+        </p>
+        <div class="hero-grid">
+          <article class="hero-tile"><strong>Live Monitoring</strong><p>Real-time energy and tariff insight.</p></article>
+          <article class="hero-tile"><strong>Payments</strong><p>Digital billing and payment history.</p></article>
+          <article class="hero-tile"><strong>Solar</strong><p>Generation, net-metering, and savings.</p></article>
+          <article class="hero-tile"><strong>Service</strong><p>Request tracking with progress timeline.</p></article>
+        </div>
+      </div>
+      <small style="color:#5f7387">SMART METER SUPER APP • IntelliSmart-ready interface</small>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-card fade-in">
+        <div class="tabs">
+          <button id="tabLogin" class="tab active" type="button">Login</button>
+          <button id="tabRegister" class="tab" type="button">Register</button>
+        </div>
+
+        <div class="form-row">
+          <label for="apiBase">Backend URL</label>
+          <input id="apiBase" type="text" value="http://127.0.0.1:8000" />
+        </div>
+
+        <div class="form-row">
+          <label for="roleSelect">Role</label>
+          <select id="roleSelect">
+            <option value="CONSUMER">Consumer</option>
+            <option value="ADMIN">Admin / Utility Operator</option>
+          </select>
+        </div>
+
+        <form id="loginForm" class="form">
+          <div class="form-row">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" required placeholder="you@example.com" />
+          </div>
+          <div class="form-row">
+            <label for="loginPassword">Password</label>
+            <div class="pwd-wrap">
+              <input id="loginPassword" type="password" required placeholder="Enter password" />
+              <button id="toggleLoginPwd" type="button">Show</button>
+            </div>
+          </div>
+          <button id="loginBtn" class="btn" type="submit">Sign In</button>
+        </form>
+
+        <form id="registerForm" class="form" style="display:none">
+          <div class="form-row">
+            <label for="regName">Full Name</label>
+            <input id="regName" type="text" required placeholder="Consumer name" />
+          </div>
+          <div class="form-row">
+            <label for="regEmail">Email</label>
+            <input id="regEmail" type="email" required placeholder="consumer@example.com" />
+          </div>
+          <div class="form-row">
+            <label for="regMeter">Smart Meter ID</label>
+            <input id="regMeter" type="text" required placeholder="SM-10002" />
+          </div>
+          <div class="form-row">
+            <label for="regPassword">Password</label>
+            <div class="pwd-wrap">
+              <input id="regPassword" type="password" required minlength="6" placeholder="At least 6 characters" />
+              <button id="toggleRegPwd" type="button">Show</button>
+            </div>
+          </div>
+          <button id="registerBtn" class="btn" type="submit">Create Consumer Account</button>
+        </form>
+
+        <p id="authNotice" class="notice"></p>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="./js/pages/auth.js"></script>
+</body>
+</html>
+

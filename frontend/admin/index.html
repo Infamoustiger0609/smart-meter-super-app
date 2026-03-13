@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal | SMART METER SUPER APP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h2>IntelliSmart Ops</h2>
+        <p>Utility Operations Control Center</p>
+        <input id="apiBase" type="text" value="http://127.0.0.1:8000" />
+      </div>
+      <nav id="nav" class="nav"></nav>
+      <div class="stack">
+        <div id="adminIdentity" class="badge normal">Loading...</div>
+        <button id="logoutBtn" class="btn btn-outline" type="button">Logout</button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <header class="topbar">
+        <div class="row">
+          <strong id="pageTitle">Admin Dashboard</strong>
+          <span id="sysStatus" class="badge off-peak">System: --</span>
+          <span id="gridHealth" class="badge normal">Grid Health: --</span>
+          <span id="activeMetersIndicator" class="badge normal">Active Meters: --</span>
+        </div>
+        <div class="row">
+          <small id="lastSync">Last sync: --</small>
+          <button id="refreshBtn" class="btn" type="button">Refresh</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <section id="dashboard" class="page active">
+          <div class="kpi-grid">
+            <article class="kpi"><span>Total Users</span><strong id="kpiUsers">--</strong></article>
+            <article class="kpi"><span>Total Meters</span><strong id="kpiMeters">--</strong></article>
+            <article class="kpi"><span>Open Requests</span><strong id="kpiOpenReq">--</strong></article>
+            <article class="kpi"><span>Outstanding Revenue</span><strong id="kpiOutstanding">--</strong></article>
+            <article class="kpi"><span>Current Grid Load</span><strong id="kpiGridLoad">--</strong></article>
+            <article class="kpi"><span>Projected 24h Demand</span><strong id="kpiDemand24h">--</strong></article>
+          </div>
+
+          <div class="panel-grid">
+            <article class="card"><h3>Energy Consumption Trends</h3><canvas id="chartEnergyTrend"></canvas></article>
+            <article class="card"><h3>Zone Load Distribution</h3><canvas id="chartZoneLoad"></canvas></article>
+            <article class="card"><h3>Peak Demand Analysis (Today)</h3><canvas id="chartPeakDemand"></canvas></article>
+            <article class="card"><h3>Meter Status Monitoring</h3><canvas id="chartMeterStatus"></canvas></article>
+            <article class="card"><h3>Revenue Collection Trends</h3><canvas id="chartRevenueTrend"></canvas></article>
+            <article class="card"><h3>Payment Method Distribution</h3><canvas id="chartPaymentMethods"></canvas></article>
+            <article class="card"><h3>Service Request Categories</h3><canvas id="chartRequestCategories"></canvas></article>
+            <article class="card"><h3>Solar Contribution to Grid</h3><canvas id="chartSolarContribution"></canvas></article>
+            <article class="card"><h3>Consumer Usage Segmentation</h3><canvas id="chartUsageSegmentation"></canvas></article>
+          </div>
+
+          <article class="card stack">
+            <h3>Grid Intelligence</h3>
+            <div class="kpi-grid">
+              <article class="kpi"><span>Total Energy Delivered</span><strong id="gridEnergyDelivered">--</strong></article>
+              <article class="kpi"><span>Current Carbon Emissions</span><strong id="gridCarbon">--</strong></article>
+              <article class="kpi"><span>Projected 24h Demand</span><strong id="gridProjected">--</strong></article>
+              <article class="kpi"><span>Offline Meters</span><strong id="gridOfflineMeters">--</strong></article>
+            </div>
+          </article>
+        </section>
+
+        <section id="users" class="page">
+          <article class="card stack">
+            <h3>User Management</h3>
+            <div class="toolbar">
+              <input id="usersSearch" placeholder="Search user by name/email/id" />
+              <select id="usersRoleFilter"><option value="">All Roles</option><option>USER</option><option>ADMIN</option><option>UTILITY_OPERATOR</option></select>
+              <select id="usersSort"><option value="name_asc">Name A-Z</option><option value="name_desc">Name Z-A</option><option value="created_desc">Newest</option><option value="created_asc">Oldest</option></select>
+              <select id="usersPageSize"><option>10</option><option selected>20</option><option>50</option></select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Meter Link</th><th>Actions</th></tr></thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="usersPagination"></div>
+          </article>
+        </section>
+
+        <section id="meters" class="page">
+          <article class="card stack">
+            <h3>Meter Management</h3>
+            <div class="toolbar">
+              <input id="metersSearch" placeholder="Search meter id / location" />
+              <select id="metersStatusFilter"><option value="">All Status</option><option>ACTIVE</option><option>MAINTENANCE</option></select>
+              <select id="metersSort"><option value="meter_asc">Meter ID A-Z</option><option value="meter_desc">Meter ID Z-A</option><option value="location_asc">Location A-Z</option></select>
+              <select id="metersPageSize"><option>10</option><option selected>20</option><option>50</option></select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Meter ID</th><th>Smart Meter ID</th><th>User ID</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="metersTable"></tbody>
+              </table>
+            </div>
+            <div class="pagination" id="metersPagination"></div>
+          </article>
+        </section>
+
+        <section id="requests" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Service Request Management</h3>
+              <div class="toolbar">
+                <input id="requestsSearch" placeholder="Search request/user/type" />
+                <select id="requestsStatusFilter"><option value="">All Status</option><option>OPEN</option><option>IN_PROGRESS</option><option>RESOLVED</option><option>CLOSED</option></select>
+                <select id="requestsTypeFilter"><option value="">All Types</option></select>
+                <select id="requestsPriorityFilter"><option value="">All Priority</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
+                <select id="requestsTechFilter"><option value="">All Technicians</option></select>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Request</th><th>User</th><th>Type</th><th>Priority</th><th>Technician</th><th>Status</th><th>Updated</th><th>Timeline</th></tr></thead>
+                  <tbody id="requestsTable"></tbody>
+                </table>
+              </div>
+              <div class="pagination" id="requestsPagination"></div>
+            </article>
+            <article class="card stack">
+              <h3>Update Request Status</h3>
+              <form id="requestUpdateForm" class="form-grid">
+                <input id="reqId" required placeholder="Request ID" />
+                <select id="reqStatus"><option>OPEN</option><option>IN_PROGRESS</option><option>RESOLVED</option><option>CLOSED</option></select>
+                <input id="reqNote" required placeholder="Update note" />
+                <button class="btn" type="submit">Update</button>
+              </form>
+              <pre id="requestTimelineView" class="result">Select Timeline on any request row.</pre>
+              <p id="requestUpdateMsg"></p>
+            </article>
+          </div>
+        </section>
+
+        <section id="billing" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Billing Control</h3>
+              <form id="generateBillForm" class="form-grid">
+                <input id="billUserId" required placeholder="User ID" />
+                <input id="billMonth" required placeholder="YYYY-MM" />
+                <input id="billUnits" required type="number" min="0.1" step="0.1" placeholder="Units consumed" />
+                <input id="billDueDate" required type="date" />
+                <button class="btn" type="submit">Generate</button>
+              </form>
+              <p id="billGenerateMsg"></p>
+            </article>
+            <article class="card stack">
+              <h3>All Bills</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Bill ID</th><th>User</th><th>Month</th><th>Units</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody id="billsTable"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="payments" class="page">
+          <article class="card stack">
+            <h3>Payments</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Payment ID</th><th>Bill</th><th>User</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody id="paymentsTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="solar" class="page">
+          <article class="card stack">
+            <h3>Solar Installations</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>System ID</th><th>User ID</th><th>Capacity (kW)</th><th>Install Date</th><th>Location</th></tr></thead>
+                <tbody id="solarTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="consumption" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Consumption Analytics</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Meter ID</th><th>Units (30-day aggregate)</th></tr></thead>
+                  <tbody id="consumptionTable"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="card"><h3>Monthly Consumption Trend</h3><canvas id="chartConsumptionMonthly"></canvas></article>
+            <article class="card"><h3>Daily Consumption Trend</h3><canvas id="chartConsumptionDaily"></canvas></article>
+          </div>
+        </section>
+
+        <section id="analytics" class="page">
+          <div class="panel-grid">
+            <article class="card"><h3>Revenue Composition</h3><canvas id="chartBilling"></canvas></article>
+            <article class="card"><h3>Request Volume by Status</h3><canvas id="chartReqVolume"></canvas></article>
+            <article class="card"><h3>Meter Zone Heat</h3><canvas id="chartZoneHeat"></canvas></article>
+          </div>
+        </section>
+
+        <section id="settings" class="page">
+          <div class="settings-grid">
+            <article class="card stack settings-group">
+              <h3>Application Settings</h3>
+              <label for="adminSettingsApiBase">API Base URL</label>
+              <input id="adminSettingsApiBase" placeholder="http://127.0.0.1:8000" />
+
+              <label for="adminThemeMode">Theme Mode</label>
+              <select id="adminThemeMode">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+
+              <label for="adminAccentTheme">Accent Theme</label>
+              <select id="adminAccentTheme">
+                <option value="blue">Blue</option>
+                <option value="emerald">Emerald</option>
+                <option value="violet">Violet</option>
+              </select>
+
+              <div class="switch-row">
+                <label for="adminAutoRefreshEnabled">Auto Refresh</label>
+                <input id="adminAutoRefreshEnabled" type="checkbox" />
+              </div>
+
+              <label for="adminAutoRefreshSeconds">Refresh Interval (seconds)</label>
+              <input id="adminAutoRefreshSeconds" type="number" min="3" max="120" step="1" />
+
+              <div class="row">
+                <button id="adminSettingsSaveBtn" class="btn" type="button">Save Settings</button>
+                <button id="adminSettingsResetBtn" class="btn btn-outline" type="button">Reset Defaults</button>
+              </div>
+              <p id="adminSettingsStatus" class="result">No changes yet.</p>
+            </article>
+
+            <article class="card stack settings-group">
+              <h3>Portal Information</h3>
+              <p id="adminAppInfo" class="result"></p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div id="chartModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="chartModalTitle">Chart Details</h3>
+        <button id="chartModalClose" class="btn btn-outline" type="button">Close</button>
+      </div>
+      <div class="modal-chart">
+        <canvas id="chartModalCanvas"></canvas>
+      </div>
+      <div class="modal-grid">
+        <div class="mini-table-wrap">
+          <table>
+            <thead><tr><th>Label</th><th>Value</th></tr></thead>
+            <tbody id="chartModalStats"></tbody>
+          </table>
+        </div>
+        <div id="chartModalNote" class="modal-note">No additional notes.</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/admin.js"></script>
+</body>
+</html>
