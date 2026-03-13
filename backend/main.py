@@ -6,11 +6,13 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import logging
+from pathlib import Path
 
 from backend import simulation_state
 from backend.meter import get_live_meter_reading
@@ -39,6 +41,12 @@ app = FastAPI(title="Smart Meter Super App")
 logger = logging.getLogger("superapp")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+INDEX_FILE = FRONTEND_DIR / "index.html"
+
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -146,7 +154,9 @@ def _build_rule_based_recommendation() -> dict:
 
 
 @app.get("/")
-def root():
+async def serve_frontend():
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
     return {"status": "Backend running successfully"}
 
 
@@ -465,4 +475,5 @@ app.include_router(help_router)
 app.include_router(solar_router)
 app.include_router(admin_router)
 app.include_router(chat_router)
+
 
