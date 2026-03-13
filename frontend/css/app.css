@@ -381,6 +381,50 @@
   gap: 0.9rem;
 }
 
+.appliances-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.appliances-right-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  min-height: 560px;
+}
+
+.appliances-controls-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+}
+
+.appliances-controls-card #applianceList {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.appliances-schedule-card,
+.appliance-graph-card {
+  height: 100%;
+  min-height: 0;
+}
+
+.appliance-graph-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.appliance-graph-card canvas {
+  max-width: 100%;
+}
+
 .list {
   margin: 0;
   padding-left: 1rem;
@@ -429,6 +473,16 @@ td {
   background: var(--bg-elevated);
 }
 
+.appliance-card,
+.appliance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
 .device-icon {
   width: 34px;
   height: 34px;
@@ -443,6 +497,12 @@ td {
 .device-meta {
   display: grid;
   gap: 0.12rem;
+}
+
+.appliance-info,
+.device-meta {
+  flex: 1;
+  min-width: 120px;
 }
 
 .device-sub {
@@ -466,6 +526,7 @@ td {
   width: 44px;
   height: 25px;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -524,6 +585,8 @@ td {
 .schedule-compact {
   display: grid;
   gap: 0.6rem;
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .schedule-form-row {
@@ -538,6 +601,11 @@ td {
   margin: 0;
   display: grid;
   gap: 0.45rem;
+}
+
+.schedule-container {
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .schedule-item {
@@ -1169,5 +1237,142 @@ body {
 
   .chat-toggle-label {
     display: none;
+  }
+}
+/* Layout containment hotfix */
+* {
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .appliances-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .appliances-right-panel {
+    grid-template-rows: auto auto;
+    min-height: 0;
+  }
+
+  .appliances-controls-card {
+    min-height: 0;
+  }
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overflow-x: hidden;
+}
+
+body.sidebar-open {
+  overflow: hidden;
+}
+
+.shell {
+  display: flex;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.appliance-item,
+.appliance-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  overflow: hidden;
+}
+
+.device-meta,
+.appliance-info {
+  flex: 1;
+  min-width: 120px;
+}
+
+.toggle-switch {
+  flex-shrink: 0;
+}
+
+.schedule-compact,
+.schedule-container {
+  max-height: 320px;
+  overflow-y: auto;
+  align-content: start;
+}
+
+.schedule-list {
+  overflow-y: auto;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 900;
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+img,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .appliance-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    transform: translateX(-100%);
+    z-index: 901;
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .main {
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }

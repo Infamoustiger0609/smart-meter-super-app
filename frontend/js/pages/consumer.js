@@ -1344,7 +1344,7 @@ async function init() {
     `System status: Connected`,
     `Connected meter: ${state.user?.smart_meter_id || "-"}`,
     `Consumer: ${state.user?.full_name || "-"}`,
-    "Developer: IntelliSmart Super App Team",
+    "Developer: Brainstorm Brigades",
     "Support: support@intellismart.demo",
   ].join("\n");
   switchPage("overview");

@@ -124,31 +124,33 @@
         </section>
 
         <section id="appliances" class="page">
-          <div class="panel-grid">
-            <article class="card stack">
+          <div class="appliances-layout">
+            <article class="card stack appliances-controls-card">
               <h3>Appliance Controls</h3>
               <div id="applianceList" class="appliance-grid"></div>
             </article>
-            <article class="card schedule-compact">
-              <h3>Schedule Automation</h3>
-              <form id="scheduleForm" class="schedule-form-row">
-                <select id="scheduleDevice" required aria-label="Appliance"></select>
-                <input id="scheduleTime" type="time" required aria-label="Run time" />
-                <select id="scheduleRepeat" aria-label="Repeat">
-                  <option value="daily">Daily</option>
-                  <option value="weekdays">Weekdays</option>
-                  <option value="weekends">Weekends</option>
-                  <option value="once">Once</option>
-                </select>
-                <button class="btn" type="submit">Schedule</button>
-              </form>
-              <ul id="scheduleList" class="schedule-list"></ul>
-            </article>
-            <article class="card stack">
-              <h3>Appliance Energy Distribution</h3>
-              <canvas id="chartApplianceMix"></canvas>
-              <p id="applianceMixSummary" class="result">Loading appliance energy distribution...</p>
-            </article>
+            <div class="appliances-right-panel">
+              <article class="card schedule-compact appliances-schedule-card">
+                <h3>Schedule Automation</h3>
+                <form id="scheduleForm" class="schedule-form-row">
+                  <select id="scheduleDevice" required aria-label="Appliance"></select>
+                  <input id="scheduleTime" type="time" required aria-label="Run time" />
+                  <select id="scheduleRepeat" aria-label="Repeat">
+                    <option value="daily">Daily</option>
+                    <option value="weekdays">Weekdays</option>
+                    <option value="weekends">Weekends</option>
+                    <option value="once">Once</option>
+                  </select>
+                  <button class="btn" type="submit">Schedule</button>
+                </form>
+                <ul id="scheduleList" class="schedule-list"></ul>
+              </article>
+              <article class="card stack appliance-graph-card">
+                <h3>Appliance Energy Distribution</h3>
+                <canvas id="chartApplianceMix"></canvas>
+                <p id="applianceMixSummary" class="result">Loading appliance energy distribution...</p>
+              </article>
+            </div>
           </div>
           <article class="card stack">
             <h3>Tariff Simulation</h3>
