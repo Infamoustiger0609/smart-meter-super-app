@@ -480,8 +480,41 @@ app.include_router(chat_router)
 
 
 @app.get("/{full_path:path}")
-async def serve_frontend_catchall(full_path: str):
+async def spa_fallback(full_path: str):
+    normalized = (full_path or "").strip("/")
+    first_segment = normalized.split("/", 1)[0] if normalized else ""
+
+    consumer_routes = {
+        "app",
+        "overview",
+        "appliances",
+        "billing",
+        "payments",
+        "analytics",
+        "service",
+        "solar",
+        "calculator",
+        "help",
+        "settings",
+        "dashboard",
+    }
+
+    if first_segment in consumer_routes:
+        app_index = FRONTEND_DIR / "app" / "index.html"
+        if app_index.exists():
+            return FileResponse(str(app_index))
+
+    if first_segment == "admin":
+        admin_index = FRONTEND_DIR / "admin" / "index.html"
+        if admin_index.exists():
+            return FileResponse(str(admin_index))
+
+    if first_segment == "superapp":
+        superapp_index = FRONTEND_DIR / "superapp" / "index.html"
+        if superapp_index.exists():
+            return FileResponse(str(superapp_index))
+
     index_file = FRONTEND_DIR / "index.html"
     if index_file.exists():
         return FileResponse(str(index_file))
-    return {"status": "frontend missing"}
+    return JSONResponse({"detail": "Not Found"}, status_code=404)

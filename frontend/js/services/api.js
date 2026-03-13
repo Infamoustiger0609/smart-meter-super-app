@@ -1,16 +1,11 @@
 import { API_BASE } from "../config.js";
 
-const isLocalhost = window.location.hostname === "localhost";
-const savedApiBase = (localStorage.getItem("sm_api_base") || "").trim().replace(/\/$/, "");
-
 export const appState = {
-  apiBase: isLocalhost ? (savedApiBase || API_BASE) : API_BASE,
+  apiBase: API_BASE,
 };
 
-export function setApiBase(url) {
-  const normalized = (url || "").trim().replace(/\/$/, "");
-  appState.apiBase = isLocalhost ? (normalized || API_BASE) : API_BASE;
-  localStorage.setItem("sm_api_base", appState.apiBase);
+export function setApiBase() {
+  appState.apiBase = API_BASE;
 }
 
 export async function api(path, options = {}, token = "") {

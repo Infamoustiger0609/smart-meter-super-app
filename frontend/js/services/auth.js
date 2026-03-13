@@ -1,6 +1,8 @@
-﻿const TOKEN_KEY = "sm_token";
-const ROLE_KEY = "sm_role";
+const TOKEN_KEY = "token";
+const ROLE_KEY = "role";
 const USER_KEY = "sm_user";
+const LEGACY_TOKEN_KEY = "sm_token";
+const LEGACY_ROLE_KEY = "sm_role";
 
 export function decodeJwt(token) {
   try {
@@ -13,20 +15,26 @@ export function decodeJwt(token) {
 }
 
 export function storeSession({ token, role, user }) {
-  localStorage.setItem(TOKEN_KEY, token || "");
-  localStorage.setItem(ROLE_KEY, role || "");
+  const t = token || "";
+  const r = role || "";
+  localStorage.setItem(TOKEN_KEY, t);
+  localStorage.setItem(ROLE_KEY, r);
+  localStorage.setItem(LEGACY_TOKEN_KEY, t);
+  localStorage.setItem(LEGACY_ROLE_KEY, r);
   localStorage.setItem(USER_KEY, JSON.stringify(user || null));
 }
 
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(ROLE_KEY);
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
+  localStorage.removeItem(LEGACY_ROLE_KEY);
   localStorage.removeItem(USER_KEY);
 }
 
 export function getSession() {
-  const token = localStorage.getItem(TOKEN_KEY) || "";
-  const role = localStorage.getItem(ROLE_KEY) || "";
+  const token = localStorage.getItem(TOKEN_KEY) || localStorage.getItem(LEGACY_TOKEN_KEY) || "";
+  const role = localStorage.getItem(ROLE_KEY) || localStorage.getItem(LEGACY_ROLE_KEY) || "";
   const userRaw = localStorage.getItem(USER_KEY);
   const user = userRaw ? JSON.parse(userRaw) : null;
 
@@ -44,9 +52,8 @@ export function getSession() {
 export function requireRole(allowedRoles = []) {
   const session = getSession();
   if (!session.valid || (allowedRoles.length && !allowedRoles.includes(session.role))) {
-    window.location.href = "../index.html";
+    window.location.href = "/";
     return null;
   }
   return session;
 }
-

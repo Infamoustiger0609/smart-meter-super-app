@@ -1,4 +1,4 @@
-import { api, appState, rs, setApiBase } from "../services/api.js";
+import { api, appState, rs } from "../services/api.js";
 import { clearSession, requireRole } from "../services/auth.js";
 import { barConfig, doughnutConfig, renderChart } from "../services/charts.js";
 
@@ -584,18 +584,12 @@ function closeChartModal() {
 }
 
 function bindEvents() {
-  const isLocalhost = window.location.hostname === "localhost";
-
   if (el.apiBase) {
     el.apiBase.value = appState.apiBase || window.location.origin;
-    if (isLocalhost) {
-      el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
-    } else {
-      el.apiBase.style.display = "none";
-    }
+    el.apiBase.style.display = "none";
   }
 
-  if (!isLocalhost && el.adminSettingsApiBase) {
+  if (el.adminSettingsApiBase) {
     const apiLabel = document.querySelector("label[for='adminSettingsApiBase']");
     if (apiLabel) apiLabel.style.display = "none";
     el.adminSettingsApiBase.style.display = "none";
@@ -603,7 +597,7 @@ function bindEvents() {
 
   el.logoutBtn?.addEventListener("click", () => {
     clearSession();
-    window.location.href = "../index.html";
+    window.location.href = "/";
   });
 
   el.refreshBtn?.addEventListener("click", async () => {
@@ -611,9 +605,7 @@ function bindEvents() {
   });
 
   el.adminSettingsSaveBtn?.addEventListener("click", async () => {
-    const nextApiBase = isLocalhost
-      ? ((el.adminSettingsApiBase?.value || "").trim() || appState.apiBase)
-      : appState.apiBase;
+    const nextApiBase = appState.apiBase;
     const nextTheme = el.adminThemeMode?.value === "dark" ? "dark" : "light";
     const nextAccent = el.adminAccentTheme?.value || "blue";
     const nextAutoRefreshEnabled = !!el.adminAutoRefreshEnabled?.checked;
@@ -629,7 +621,6 @@ function bindEvents() {
     localStorage.setItem("sm_admin_auto_refresh_enabled", nextAutoRefreshEnabled ? "1" : "0");
     localStorage.setItem("sm_admin_auto_refresh_seconds", String(nextAutoRefreshSeconds));
 
-    setApiBase(nextApiBase);
     if (el.apiBase) el.apiBase.value = nextApiBase;
     applyTheme();
     applyAutoRefresh();
@@ -736,4 +727,6 @@ async function init() {
 }
 
 init();
+
+
 

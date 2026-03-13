@@ -1,8 +1,7 @@
-import { api, appState, setApiBase } from "../services/api.js";
-import { clearSession, storeSession } from "../services/auth.js";
+import { api } from "../services/api.js";
+import { storeSession } from "../services/auth.js";
 
 const el = {
-  apiBase: document.getElementById("apiBase"),
   roleSelect: document.getElementById("roleSelect"),
   tabLogin: document.getElementById("tabLogin"),
   tabRegister: document.getElementById("tabRegister"),
@@ -42,6 +41,15 @@ function setNotice(text, isError = false) {
   el.notice.classList.toggle("error", isError);
 }
 
+function isAdminRole(role = "") {
+  const normalized = String(role || "").toUpperCase();
+  return normalized === "ADMIN" || normalized === "UTILITY_OPERATOR";
+}
+
+function rolePath(role) {
+  return isAdminRole(role) ? "/admin" : "/app";
+}
+
 function setMode(nextMode) {
   mode = nextMode;
   el.tabLogin.classList.toggle("active", nextMode === "login");
@@ -49,11 +57,9 @@ function setMode(nextMode) {
   el.loginForm.style.display = nextMode === "login" ? "grid" : "none";
   el.registerForm.style.display = nextMode === "register" ? "grid" : "none";
 
-  const isAdminRole = el.roleSelect.value === "ADMIN";
-  el.tabRegister.disabled = isAdminRole;
-  if (isAdminRole && nextMode === "register") {
-    setMode("login");
-  }
+  const isAdminSelected = el.roleSelect.value === "ADMIN";
+  el.tabRegister.disabled = isAdminSelected;
+  if (isAdminSelected && nextMode === "register") setMode("login");
 }
 
 function togglePwd(input, btn) {
@@ -62,8 +68,16 @@ function togglePwd(input, btn) {
   btn.textContent = hidden ? "Hide" : "Show";
 }
 
-function rolePath(role) {
-  return role === "USER" ? "./app/" : "./admin/";
+function persistRoleAndToken(token, role) {
+  localStorage.setItem("token", token || "");
+  localStorage.setItem("role", role || "");
+}
+
+function redirectIfLoggedIn() {
+  const token = localStorage.getItem("token") || "";
+  const role = localStorage.getItem("role") || "";
+  if (!token) return;
+  window.location.href = rolePath(role);
 }
 
 async function doLogin(event) {
@@ -83,12 +97,14 @@ async function doLogin(event) {
     if (selected === "CONSUMER" && role !== "USER") {
       throw new Error("Selected Consumer role, but account is not a Consumer.");
     }
-    if (selected === "ADMIN" && !["ADMIN", "UTILITY_OPERATOR"].includes(role)) {
+    if (selected === "ADMIN" && !isAdminRole(role)) {
       throw new Error("Selected Admin role, but account is not Admin/Utility Operator.");
     }
 
     const profileRes = await api("/auth/profile", {}, loginRes.access_token);
     storeSession({ token: loginRes.access_token, role, user: profileRes.data });
+    persistRoleAndToken(loginRes.access_token, role);
+
     setNotice("Login successful. Redirecting...");
     window.location.href = rolePath(role);
   } catch (err) {
@@ -117,8 +133,10 @@ async function doRegister(event) {
     });
 
     storeSession({ token: res.access_token, role: res.user.role, user: res.user });
+    persistRoleAndToken(res.access_token, res.user.role);
+
     setNotice("Registration successful. Redirecting to Consumer app...");
-    window.location.href = "./app/";
+    window.location.href = "/app";
   } catch (err) {
     setNotice(err.message, true);
   }
@@ -126,16 +144,8 @@ async function doRegister(event) {
 
 function init() {
   applyTheme();
-  clearSession();
-  const isLocalhost = window.location.hostname === "localhost";
-  el.apiBase.value = appState.apiBase || window.location.origin;
+  redirectIfLoggedIn();
 
-  if (!isLocalhost) {
-    const apiRow = el.apiBase.closest(".form-row");
-    if (apiRow) apiRow.style.display = "none";
-  } else {
-    el.apiBase.addEventListener("change", () => setApiBase(el.apiBase.value));
-  }
   el.tabLogin.addEventListener("click", () => setMode("login"));
   el.tabRegister.addEventListener("click", () => setMode("register"));
   el.loginForm.addEventListener("submit", doLogin);
@@ -148,7 +158,5 @@ function init() {
   setMode("login");
   setNotice("Demo Consumer: user@demo.com / demo123 | Demo Admin: admin@demo.com / admin123");
 }
+
 init();
-
-
-

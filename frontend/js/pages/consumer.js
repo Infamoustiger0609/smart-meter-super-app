@@ -1,4 +1,4 @@
-import { api, appState, rs, setApiBase } from "../services/api.js";
+import { api, appState, rs } from "../services/api.js";
 import { clearSession, requireRole } from "../services/auth.js";
 import { barConfig, doughnutConfig, renderChart } from "../services/charts.js";
 
@@ -933,21 +933,12 @@ function applyAutoRefresh() {
 }
 
 function bindEvents() {
-  const isLocalhost = window.location.hostname === "localhost";
   el.apiBase.value = appState.apiBase || window.location.origin;
   el.settingsApiBase.value = appState.apiBase || window.location.origin;
 
-  if (!isLocalhost) {
-    if (el.apiBase) el.apiBase.style.display = "none";
-    const apiSettingsGroup = el.settingsApiBase?.closest(".form-grid");
-    if (apiSettingsGroup) apiSettingsGroup.style.display = "none";
-  } else {
-    el.apiBase.addEventListener("change", () => {
-      setApiBase(el.apiBase.value);
-      el.settingsApiBase.value = appState.apiBase;
-      logEvent(`Backend URL changed to ${appState.apiBase}`);
-    });
-  }
+  if (el.apiBase) el.apiBase.style.display = "none";
+  const apiSettingsGroup = el.settingsApiBase?.closest(".form-grid");
+  if (apiSettingsGroup) apiSettingsGroup.style.display = "none";
 
   el.settingsBtn.addEventListener("click", () => switchPage("settings"));
 
@@ -955,7 +946,7 @@ function bindEvents() {
 
   el.logoutBtn.addEventListener("click", () => {
     clearSession();
-    window.location.href = "../index.html";
+    window.location.href = "/";
   });
 
   el.runAi.addEventListener("click", runAi);
@@ -1121,15 +1112,7 @@ function bindEvents() {
     } catch (err) {
       logEvent(err.message, true);
     }
-  });
-  if (window.location.hostname === "localhost") {
-    el.applySettingsApi.addEventListener("click", () => {
-      setApiBase(el.settingsApiBase.value);
-      el.apiBase.value = appState.apiBase;
-      el.settingsStatus.textContent = `Backend URL applied: ${appState.apiBase}`;
-      logEvent(`Backend URL changed to ${appState.apiBase}`);
-    });
-  }
+  });
 
   el.darkModeToggle?.addEventListener("change", () => {
     state.prefs.darkMode = !!el.darkModeToggle.checked;
@@ -1213,8 +1196,7 @@ function bindEvents() {
     state.autoRefreshSeconds = 6;
     el.autoRefreshEnabled.checked = true;
     el.autoRefreshSeconds.value = "6";
-    el.settingsApiBase.value = window.location.origin;
-    setApiBase(el.settingsApiBase.value);
+    el.settingsApiBase.value = appState.apiBase;
     el.apiBase.value = appState.apiBase;
     state.prefs = {
       darkMode: false,
@@ -1343,6 +1325,8 @@ async function init() {
 }
 
 init().catch((err) => logEvent(err.message, true));
+
+
 
 
 
