@@ -21,7 +21,7 @@ from backend.appliances import get_all_appliances, update_appliance_state, get_t
 from backend.ai_engine import generate_ai_response
 from backend.cost import get_current_cost, get_billing_estimate
 from backend.optimizer import get_optimized_savings
-from backend.scheduler import add_schedule, get_schedules, run_schedules
+from backend.scheduler import add_schedule, get_schedules, run_schedules, clear_all_schedules
 from backend.routers.admin_router import router as admin_router
 from backend.routers.auth_router import router as auth_router
 from backend.routers.billing_router import router as billing_router
@@ -460,6 +460,41 @@ def schedule_device(request: ScheduleRequest):
 @app.get("/schedule")
 def view_schedule():
     return get_schedules()
+
+
+@app.delete("/schedule")
+def clear_all_schedules_endpoint():
+    count = clear_all_schedules()
+    return {"status": "cleared", "count": count}
+
+
+@app.delete("/schedule/{device_id}")
+def remove_schedule_endpoint(device_id: str, run_time: str = None):
+    from backend.scheduler import remove_schedule
+    count = remove_schedule(device_id=device_id, run_time=run_time)
+    return {"status": "removed", "count": count}
+
+
+@app.post("/schedule/clear-confirm")
+def clear_all_schedules_confirm():
+    from backend.scheduler import clear_all_schedules, get_schedules, remove_schedule
+
+    cleared_total = 0
+    for _ in range(5):
+        cleared_total += clear_all_schedules()
+        remaining = list(get_schedules() or [])
+        if not remaining:
+            return {"status": "cleared", "count": cleared_total, "remaining": 0}
+
+        # Defensive per-item purge if anything survived bulk clear.
+        for task in remaining:
+            try:
+                remove_schedule(device_id=task.get("device_id"), run_time=task.get("run_time"))
+            except Exception:
+                continue
+
+    remaining = len(get_schedules() or [])
+    return {"status": "partial", "count": cleared_total, "remaining": remaining}
 
 
 # Super App feature routers (in-memory prototype; DB can be swapped in later)

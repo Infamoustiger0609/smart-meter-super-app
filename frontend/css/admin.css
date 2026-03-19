@@ -598,3 +598,165 @@ body {
     font-size: 0.84rem;
   }
 }
+
+/* Fix 1 - Admin sidebar scroll */
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+
+.content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-content);
+}
+
+/* Fix 2 - Service Requests layout */
+#requests .panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+#requests .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#requests select,
+#requests input[placeholder*="Search"] {
+  min-width: 120px;
+  max-width: 160px;
+}
+
+#requests input[placeholder*="Search"] {
+  min-width: 160px;
+  flex: 1;
+}
+
+#requests table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+#requests th:nth-child(1), 
+#requests td:nth-child(1) { width: 100px; }
+
+#requests th:nth-child(2), 
+#requests td:nth-child(2) { width: 100px; }
+
+#requests th:nth-child(3), 
+#requests td:nth-child(3) { width: auto; }
+
+#requests td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#requestUpdateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#requestUpdateForm input,
+#requestUpdateForm select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#requestUpdateForm .form-grid {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#requestUpdateForm .form-grid input,
+#requestUpdateForm .form-grid select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Fix 3 - Billing Control layout */
+#billing .panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+}
+
+#generateBillForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#generateBillForm input,
+#generateBillForm select {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+#generateBillForm label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+#billing table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+#billing th, 
+#billing td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 8px 6px;
+  font-size: 13px;
+}
+
+#billing th:nth-child(1),
+#billing td:nth-child(1) { width: 80px; }
+
+#billing th:nth-child(2),
+#billing td:nth-child(2) { width: 90px; }
+
+#billing th:nth-child(3),
+#billing td:nth-child(3) { width: 80px; }
+
+#billing th:nth-child(4),
+#billing td:nth-child(4) { width: auto; }

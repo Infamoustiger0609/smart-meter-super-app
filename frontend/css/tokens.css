@@ -180,10 +180,10 @@ textarea:focus {
 
 .card {
   border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   background: var(--surface-card);
   box-shadow: var(--shadow-sm);
-  padding: 1rem;
+  padding: 20px;
 }
 
 .stack {

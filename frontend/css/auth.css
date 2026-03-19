@@ -1,4 +1,4 @@
-﻿@import url("./tokens.css");
+@import url("./tokens.css");
 
 body {
   min-height: 100vh;
@@ -98,14 +98,24 @@ body {
 
 .pwd-wrap button {
   position: absolute;
-  right: 8px;
-  top: 8px;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   border: 0;
-  border-radius: 8px;
-  padding: 0.28rem 0.48rem;
-  background: var(--bg-muted);
-  color: var(--text);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  color: #666;
   cursor: pointer;
+}
+
+.pwd-wrap button svg {
+  width: 18px;
+  height: 18px;
 }
 
 .notice {

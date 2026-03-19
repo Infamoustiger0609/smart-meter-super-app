@@ -45,3 +45,10 @@ def run_schedules():
 
     return executed
 
+
+def clear_all_schedules():
+    global scheduled_tasks
+    count = len(scheduled_tasks)
+    scheduled_tasks = []
+    return count
+

@@ -13,10 +13,12 @@ const state = {
   role: session.role,
   appliances: {},
   autoRefreshEnabled: true,
-  autoRefreshSeconds: 6,
+  autoRefreshSeconds: 60,
   autoRefreshTimer: null,
   chatSessionId: "",
   scheduleMeta: {},
+  forceHideSchedules: sessionStorage.getItem("force_hide_schedules") === "1",
+  usageComparison: null, // Store comparison calculation once
   prefs: {
     darkMode: localStorage.getItem("sm_theme_mode") === "dark",
     accentTheme: localStorage.getItem("sm_accent_theme") || "blue",
@@ -45,112 +47,125 @@ const pages = [
 ];
 
 const el = {
-  apiBase: document.getElementById("apiBase"),
-  nav: document.getElementById("nav"),
-  whoami: document.getElementById("whoami"),
-  logoutBtn: document.getElementById("logoutBtn"),
-  settingsBtn: document.getElementById("settingsBtn"),
-  pageTitle: document.getElementById("pageTitle"),
-  refreshBtn: document.getElementById("refreshBtn"),
-  lastSync: document.getElementById("lastSync"),
-  tariffBadge: document.getElementById("tariffBadge"),
-  events: document.getElementById("events"),
-  kpiLoad: document.getElementById("kpiLoad"),
-  kpiCost: document.getElementById("kpiCost"),
-  kpiSavings: document.getElementById("kpiSavings"),
-  kpiSavingsPct: document.getElementById("kpiSavingsPct"),
-  kpiCarbonRate: document.getElementById("kpiCarbonRate"),
-  kpiCarbonToday: document.getElementById("kpiCarbonToday"),
-  kpiCarbonMonth: document.getElementById("kpiCarbonMonth"),
-  kpiCarbonIntensity: document.getElementById("kpiCarbonIntensity"),
-  carbonGauge: document.getElementById("carbonGauge"),
-  savingsGauge: document.getElementById("savingsGauge"),
-  energyBalanceCard: document.getElementById("energyBalanceCard"),
-  balanceMeterType: document.getElementById("balanceMeterType"),
-  balanceCurrent: document.getElementById("balanceCurrent"),
-  balanceDaily: document.getElementById("balanceDaily"),
-  balanceDays: document.getElementById("balanceDays"),
-  balanceNextBill: document.getElementById("balanceNextBill"),
-  balanceInsight: document.getElementById("balanceInsight"),
-  balanceActionBtn: document.getElementById("balanceActionBtn"),
-  balanceForecastBtn: document.getElementById("balanceForecastBtn"),
-  runAi: document.getElementById("runAi"),
-  aiText: document.getElementById("aiText"),
-  subStatus: document.getElementById("subStatus"),
-  planActions: document.getElementById("planActions"),
-  applianceList: document.getElementById("applianceList"),
-  applianceMixSummary: document.getElementById("applianceMixSummary"),
-  scheduleForm: document.getElementById("scheduleForm"),
-  scheduleDevice: document.getElementById("scheduleDevice"),
-  scheduleTime: document.getElementById("scheduleTime"),
-  scheduleRepeat: document.getElementById("scheduleRepeat"),
-  scheduleList: document.getElementById("scheduleList"),
-  simulateTimeForm: document.getElementById("simulateTimeForm"),
-  simulateTime: document.getElementById("simulateTime"),
-  simulateMsg: document.getElementById("simulateMsg"),
-  whatIfForm: document.getElementById("whatIfForm"),
-  whatIfDevices: document.getElementById("whatIfDevices"),
-  whatIfTime: document.getElementById("whatIfTime"),
-  whatIfResult: document.getElementById("whatIfResult"),
-  currentBill: document.getElementById("currentBill"),
-  billingEstimateForm: document.getElementById("billingEstimateForm"),
-  billingUnits: document.getElementById("billingUnits"),
-  billingEstimate: document.getElementById("billingEstimate"),
-  billHistory: document.getElementById("billHistory"),
-  payForm: document.getElementById("payForm"),
-  payBillId: document.getElementById("payBillId"),
-  payAmount: document.getElementById("payAmount"),
-  payMethod: document.getElementById("payMethod"),
-  payMessage: document.getElementById("payMessage"),
-  paymentHistory: document.getElementById("paymentHistory"),
-  serviceForm: document.getElementById("serviceForm"),
-  serviceType: document.getElementById("serviceType"),
-  serviceDesc: document.getElementById("serviceDesc"),
-  serviceHistory: document.getElementById("serviceHistory"),
-  serviceTimeline: document.getElementById("serviceTimeline"),
-  solarSummary: document.getElementById("solarSummary"),
-  solarNet: document.getElementById("solarNet"),
-  calcForm: document.getElementById("calcForm"),
-  calcType: document.getElementById("calcType"),
-  calcPower: document.getElementById("calcPower"),
-  calcHours: document.getElementById("calcHours"),
-  calcResult: document.getElementById("calcResult"),
-  faqList: document.getElementById("faqList"),
-  helpForm: document.getElementById("helpForm"),
-  helpSubject: document.getElementById("helpSubject"),
-  helpMessage: document.getElementById("helpMessage"),
-  helpResult: document.getElementById("helpResult"),
-  settingsApiBase: document.getElementById("settingsApiBase"),
-  darkModeToggle: document.getElementById("darkModeToggle"),
-  accentTheme: document.getElementById("accentTheme"),
-  languageSelect: document.getElementById("languageSelect"),
-  notifToggle: document.getElementById("notifToggle"),
-  energyAlertToggle: document.getElementById("energyAlertToggle"),
-  energyAlertThreshold: document.getElementById("energyAlertThreshold"),
-  aiAssistantToggle: document.getElementById("aiAssistantToggle"),
-  aiStyleSelect: document.getElementById("aiStyleSelect"),
-  defaultApplianceBehavior: document.getElementById("defaultApplianceBehavior"),
-  profileVisibility: document.getElementById("profileVisibility"),
-  appInfo: document.getElementById("appInfo"),
-  applySettingsApi: document.getElementById("applySettingsApi"),
-  autoRefreshEnabled: document.getElementById("autoRefreshEnabled"),
-  autoRefreshSeconds: document.getElementById("autoRefreshSeconds"),
-  applyRefreshSettings: document.getElementById("applyRefreshSettings"),
-  clearLogsBtn: document.getElementById("clearLogsBtn"),
-  resetSettingsBtn: document.getElementById("resetSettingsBtn"),
-  settingsStatus: document.getElementById("settingsStatus"),
-  chatToggle: document.getElementById("chatToggle"),
-  chatWidget: document.getElementById("chatWidget"),
-  chatClose: document.getElementById("chatClose"),
-  chatMessages: document.getElementById("chatMessages"),
-  chatForm: document.getElementById("chatForm"),
-  chatInput: document.getElementById("chatInput"),
-  chatTyping: document.getElementById("chatTyping"),
-  chatQuickActions: document.getElementById("chatQuickActions"),
-  sidebar: document.querySelector(".sidebar"),
-  sidebarToggle: document.getElementById("sidebarToggle"),
-  sidebarBackdrop: document.getElementById("sidebarBackdrop"),
-};
+    apiBase: document.getElementById("apiBase"),
+    nav: document.getElementById("nav"),
+    whoami: document.getElementById("whoami"),
+    logoutBtn: document.getElementById("logoutBtn"),
+    settingsBtn: document.getElementById("settingsBtn"),
+    pageTitle: document.getElementById("pageTitle"),
+    refreshBtn: document.getElementById("refreshBtn"),
+    lastSync: document.getElementById("lastSync"),
+    tariffBadge: document.getElementById("tariffBadge"),
+    events: document.getElementById("events"),
+    kpiLoad: document.getElementById("kpiLoad"),
+    kpiCost: document.getElementById("kpiCost"),
+    kpiSavings: document.getElementById("kpiSavings"),
+    kpiSavingsPct: document.getElementById("kpiSavingsPct"),
+    kpiCarbonRate: document.getElementById("kpiCarbonRate"),
+    kpiCarbonToday: document.getElementById("kpiCarbonToday"),
+    kpiCarbonMonth: document.getElementById("kpiCarbonMonth"),
+    kpiCarbonIntensity: document.getElementById("kpiCarbonIntensity"),
+    carbonGauge: document.getElementById("carbonGauge"),
+    savingsGauge: document.getElementById("savingsGauge"),
+    meterIdDisplay: document.getElementById("meterIdDisplay"),
+    usageComparison: document.getElementById("usageComparison"),
+    currentTimeLine: document.getElementById("currentTimeLine"),
+    tariffStatusText: document.getElementById("tariffStatusText"),
+    addApplianceBtn: document.getElementById("addApplianceBtn"),
+    addApplianceModal: document.getElementById("addApplianceModal"),
+    closeModalBtn: document.getElementById("closeModalBtn"),
+    addApplianceForm: document.getElementById("addApplianceForm"),
+    cancelAddAppliance: document.getElementById("cancelAddAppliance"),
+    applianceName: document.getElementById("applianceName"),
+    applianceType: document.getElementById("applianceType"),
+    appliancePower: document.getElementById("appliancePower"),
+    addScheduleBtn: document.getElementById("addScheduleBtn"),
+    energyBalanceCard: document.getElementById("energyBalanceCard"),
+    balanceMeterType: document.getElementById("balanceMeterType"),
+    balanceCurrent: document.getElementById("balanceCurrent"),
+    balanceDaily: document.getElementById("balanceDaily"),
+    balanceDays: document.getElementById("balanceDays"),
+    balanceNextBill: document.getElementById("balanceNextBill"),
+    balanceInsight: document.getElementById("balanceInsight"),
+    balanceActionBtn: document.getElementById("balanceActionBtn"),
+    balanceForecastBtn: document.getElementById("balanceForecastBtn"),
+    runAi: document.getElementById("runAi"),
+    aiText: document.getElementById("aiText"),
+    subStatus: document.getElementById("subStatus"),
+    planActions: document.getElementById("planActions"),
+    applianceList: document.getElementById("applianceList"),
+    applianceMixSummary: document.getElementById("applianceMixSummary"),
+    scheduleForm: document.getElementById("scheduleForm"),
+    scheduleDevice: document.getElementById("scheduleDevice"),
+    scheduleTime: document.getElementById("scheduleTime"),
+    scheduleRepeat: document.getElementById("scheduleRepeat"),
+    scheduleList: document.getElementById("scheduleList"),
+    simulateTimeForm: document.getElementById("simulateTimeForm"),
+    simulateTime: document.getElementById("simulateTime"),
+    simulateMsg: document.getElementById("simulateMsg"),
+    whatIfForm: document.getElementById("whatIfForm"),
+    whatIfDevices: document.getElementById("whatIfDevices"),
+    whatIfTime: document.getElementById("whatIfTime"),
+    whatIfResult: document.getElementById("whatIfResult"),
+    currentBill: document.getElementById("currentBill"),
+    billingEstimateForm: document.getElementById("billingEstimateForm"),
+    billingUnits: document.getElementById("billingUnits"),
+    billingEstimate: document.getElementById("billingEstimate"),
+    billHistory: document.getElementById("billHistory"),
+    payForm: document.getElementById("payForm"),
+    payBillId: document.getElementById("payBillId"),
+    payAmount: document.getElementById("payAmount"),
+    payMethod: document.getElementById("payMethod"),
+    payMessage: document.getElementById("payMessage"),
+    paymentHistory: document.getElementById("paymentHistory"),
+    serviceForm: document.getElementById("serviceForm"),
+    serviceType: document.getElementById("serviceType"),
+    serviceDesc: document.getElementById("serviceDesc"),
+    serviceHistory: document.getElementById("serviceHistory"),
+    serviceTimeline: document.getElementById("serviceTimeline"),
+    solarSummary: document.getElementById("solarSummary"),
+    solarNet: document.getElementById("solarNet"),
+    calcForm: document.getElementById("calcForm"),
+    calcType: document.getElementById("calcType"),
+    calcPower: document.getElementById("calcPower"),
+    calcHours: document.getElementById("calcHours"),
+    calcResult: document.getElementById("calcResult"),
+    faqList: document.getElementById("faqList"),
+    helpForm: document.getElementById("helpForm"),
+    helpSubject: document.getElementById("helpSubject"),
+    helpMessage: document.getElementById("helpMessage"),
+    helpResult: document.getElementById("helpResult"),
+    settingsApiBase: document.getElementById("settingsApiBase"),
+    darkModeToggle: document.getElementById("darkModeToggle"),
+    accentTheme: document.getElementById("accentTheme"),
+    languageSelect: document.getElementById("languageSelect"),
+    notifToggle: document.getElementById("notifToggle"),
+    energyAlertToggle: document.getElementById("energyAlertToggle"),
+    energyAlertThreshold: document.getElementById("energyAlertThreshold"),
+    aiAssistantToggle: document.getElementById("aiAssistantToggle"),
+    aiStyleSelect: document.getElementById("aiStyleSelect"),
+    defaultApplianceBehavior: document.getElementById("defaultApplianceBehavior"),
+    profileVisibility: document.getElementById("profileVisibility"),
+    appInfo: document.getElementById("appInfo"),
+    applySettingsApi: document.getElementById("applySettingsApi"),
+    autoRefreshEnabled: document.getElementById("autoRefreshEnabled"),
+    autoRefreshSeconds: document.getElementById("autoRefreshSeconds"),
+    applyRefreshSettings: document.getElementById("applyRefreshSettings"),
+    clearLogsBtn: document.getElementById("clearLogsBtn"),
+    resetSettingsBtn: document.getElementById("resetSettingsBtn"),
+    settingsStatus: document.getElementById("settingsStatus"),
+    chatToggle: document.getElementById("chatToggle"),
+    chatWidget: document.getElementById("chatWidget"),
+    chatClose: document.getElementById("chatClose"),
+    chatMessages: document.getElementById("chatMessages"),
+    chatForm: document.getElementById("chatForm"),
+    chatInput: document.getElementById("chatInput"),
+    chatTyping: document.getElementById("chatTyping"),
+    chatQuickActions: document.getElementById("chatQuickActions"),
+    sidebar: document.querySelector(".sidebar"),
+    sidebarToggle: document.getElementById("sidebarToggle"),
+    sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+  };
 
 const DEVICE_ICONS = {
   "air conditioner": "AC",
@@ -169,8 +184,8 @@ const DEVICE_ICONS = {
   "air cooler": "CL",
 };
 
-const CO2_PER_KWH = 0.82;
-const TYPICAL_HOUSEHOLD_KWH_PER_HOUR = 1.8;
+const CO2_PER_KWH = 0.71;
+const TYPICAL_HOUSEHOLD_KWH_PER_HOUR = 2.2;
 const TYPICAL_EMISSION_RATE = TYPICAL_HOUSEHOLD_KWH_PER_HOUR * CO2_PER_KWH;
 const SAVINGS_FULL_SCALE_RATIO = 0.4;
 const metricAnimations = new WeakMap();
@@ -382,6 +397,339 @@ function renderSolarContributionChart(netData = {}) {
   ].join("\n");
 }
 
+function renderTodayUsageChart(dailyData = []) {
+  // Generate 24 hourly data points with demo data
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  // Use seeded data so bars don't change on every refresh
+  function seededRandom(h, offset) {
+    const x = Math.sin(h * 9301 + offset * 49297 + 233720) * 10000;
+    return x - Math.floor(x);
+  }
+
+  const todayData = hours.map(hour => {
+    const actualData = dailyData.find(d => new Date(d.timestamp).getHours() === hour);
+    if (actualData) return asNumber(actualData.units);
+    const r = seededRandom(hour, 1);
+    if (hour >= 0 && hour < 4) return r * 0.5 + 0.2;
+    if (hour >= 4 && hour < 10) return r * 0.6 + 0.3;
+    if (hour >= 10 && hour < 14) return r * 0.8 + 0.4;
+    if (hour >= 14 && hour < 17) return r * 1.2 + 0.8;
+    if (hour >= 17 && hour < 22) return r * 1.5 + 1.0;
+    return r * 0.6 + 0.3;
+  });
+
+  const yesterdayData = hours.map(hour => {
+    const r = seededRandom(hour, 2);
+    if (hour >= 0 && hour < 4) return r * 0.4 + 0.3;
+    if (hour >= 4 && hour < 10) return r * 0.5 + 0.4;
+    if (hour >= 10 && hour < 14) return r * 0.7 + 0.5;
+    if (hour >= 14 && hour < 17) return r * 1.0 + 0.7;
+    if (hour >= 17 && hour < 22) return r * 1.3 + 0.9;
+    return r * 0.5 + 0.4;
+  });
+
+  // Calculate comparison only once and store
+  if (state.usageComparison === null) {
+    const todayTotal = todayData.reduce((sum, val) => sum + val, 0);
+    const yesterdayTotal = yesterdayData.reduce((sum, val) => sum + val, 0);
+    const percentChange = ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100;
+    const isMore = percentChange > 0;
+    state.usageComparison = {
+      percentChange: Math.abs(percentChange).toFixed(0),
+      isMore: isMore,
+      text: `${isMore ? '📈' : '📉'} You've used ${Math.abs(percentChange).toFixed(0)}% ${isMore ? 'more' : 'less'} than yesterday`
+    };
+  }
+
+  // Update comparison pill with stored value
+  if (el.usageComparison && state.usageComparison) {
+    el.usageComparison.className = `usage-comparison-pill ${state.usageComparison.isMore ? 'more' : 'less'}`;
+    el.usageComparison.textContent = state.usageComparison.text;
+  }
+
+  // Determine bar colors based on tariff periods
+  const barColors = hours.map(hour => {
+    if (hour >= 0 && hour < 6) return '#3b82f6'; // Off-peak: blue
+    if (hour >= 6 && hour < 9) return '#f59e0b'; // Peak: amber
+    if (hour >= 9 && hour < 17) return '#6b7280'; // Normal: gray
+    if (hour >= 17 && hour < 22) return '#f59e0b'; // Peak: amber
+    return '#3b82f6'; // Off-peak: blue
+  });
+
+  const labels = hours.map(h => `${h.toString().padStart(2, '0')}:00`);
+  
+  const config = {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Today (kWh)',
+        data: todayData,
+        backgroundColor: barColors,
+        borderColor: barColors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.parsed.y.toFixed(2)} kWh`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'kWh'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Hour of Day'
+          }
+        }
+      }
+    }
+  };
+
+  renderChart("chartTodayUsage", config);
+}
+
+// Helper function to get IST time (same as backend uses)
+function getCurrentISTHour() {
+  const now = new Date();
+  const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const istMs = utcMs + (5.5 * 60 * 60 * 1000);
+  return new Date(istMs).getHours();
+}
+
+function getCurrentISTMinutes() {
+  const now = new Date();
+  const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const istMs = utcMs + (5.5 * 60 * 60 * 1000);
+  return new Date(istMs).getMinutes();
+}
+
+// Render tariff bar from backend data
+function renderTariffBar() {
+  // Use the EXISTING tariff slots from the app
+  const slots = TOD_SLOTS;
+  if (!slots) {
+    console.error('TOD_SLOTS not found');
+    return;
+  }
+  
+  const container = document.querySelector('.tariff-segments');
+  if (!container) return;
+  
+  container.innerHTML = slots.map(slot => {
+    const widthPct = ((slot.hours.length) / 24 * 100).toFixed(2);
+    const colors = {
+      'off-peak': { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' },
+      'peak':     { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' },
+      'normal':   { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' }
+    };
+    const c = colors[slot.type] || colors['normal'];
+    return `
+      <div class="tariff-segment ${slot.type}" style="
+        width: ${widthPct}%;
+        background: ${c.bg};
+        border: 1px solid ${c.border};
+        color: ${c.text};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        height: 40px;
+        position: relative;
+        flex-shrink: 0;
+      " data-start="${slot.hours[0]}" data-end="${slot.hours[slot.hours.length-1]}">
+        <span class="segment-label">${slot.type.charAt(0).toUpperCase() + slot.type.slice(1)} Rs ${slot.rate.toFixed(2)}</span>
+      </div>
+    `;
+  }).join('');
+  
+  // After rendering segments, position the blue line
+  updateTimeIndicator();
+}
+
+// Update blue line position using IST time
+function updateTimeIndicator() {
+  const container = document.querySelector('.tariff-segments');
+  if (!container) return;
+  
+  // Use the SAME IST time the backend uses
+  const istHour = getCurrentISTHour();
+  const istMinutes = getCurrentISTMinutes();
+  
+  // Calculate position as percentage of 24 hours
+  const totalMinutes = (istHour * 60) + istMinutes;
+  const positionPct = (totalMinutes / (24 * 60) * 100).toFixed(2);
+  
+  console.log(`IST time: ${istHour}:${istMinutes.toString().padStart(2, '0')} - Position: ${positionPct}%`);
+  
+  // Remove existing indicator if any
+  const existing = container.querySelector('.time-indicator');
+  if (existing) existing.remove();
+  
+  // Add new indicator at correct position
+  const indicator = document.createElement('div');
+  indicator.className = 'time-indicator';
+  indicator.id = 'currentTimeLine';
+  indicator.style.cssText = `
+    position: absolute;
+    left: ${positionPct}%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #2563eb;
+    z-index: 10;
+    pointer-events: none;
+  `;
+  
+  // Container needs position:relative for absolute child to work
+  container.style.position = 'relative';
+  container.style.display = 'flex';
+  container.appendChild(indicator);
+}
+
+async function updateTariffSchedule() {
+  // Use the shared async function to get current tariff
+  const tariffInfo = await getCurrentTariff();
+  const { type: currentTariff, rate: currentRate, nextCheapHour } = tariffInfo;
+
+  // Render the tariff bar once
+  renderTariffBar();
+
+  // Calculate hours until next cheap slot (off-peak)
+  const istHour = getCurrentISTHour();
+  let hoursUntilNext = nextCheapHour - istHour;
+  if (hoursUntilNext <= 0) {
+    hoursUntilNext += 24;
+  }
+
+  // Update status text with backend data
+  if (el.tariffStatusText) {
+    const tariffType = currentTariff.replace('_', ' ').charAt(0).toUpperCase() + currentTariff.replace('_', ' ').slice(1);
+    el.tariffStatusText.textContent = `Current: ${tariffType} · Rs ${currentRate.toFixed(2)}/kWh · Next cheap slot: ${nextCheapHour.toString().padStart(2, '0')}:00 (in ${hoursUntilNext} hrs)`;
+    console.log(`Status text: ${el.tariffStatusText.textContent}`);
+  }
+}
+
+function showAddApplianceModal() {
+  if (el.addApplianceModal) {
+    el.addApplianceModal.style.display = 'flex';
+    el.addApplianceForm.reset();
+  }
+}
+
+function hideAddApplianceModal() {
+  if (el.addApplianceModal) {
+    el.addApplianceModal.style.display = 'none';
+  }
+}
+
+function handleAddAppliance(e) {
+  e.preventDefault();
+  
+  const name = el.applianceName.value.trim();
+  const type = el.applianceType.value;
+  const loadType = document.querySelector('input[name="loadType"]:checked')?.value;
+  const powerRating = parseFloat(el.appliancePower.value);
+  
+  if (!name || !type || !loadType || !powerRating) {
+    logEvent('Please fill all required fields', true);
+    return;
+  }
+  
+  // Create custom appliance with local ID
+  const customAppliance = {
+    id: `local_${Date.now()}`,
+    name,
+    type,
+    flexible: loadType === 'Flexible',
+    units_per_hour: powerRating,
+    state: false,
+    isCustom: true
+  };
+  
+  // Save to localStorage
+  const customAppliances = JSON.parse(localStorage.getItem('custom_appliances') || '[]');
+  customAppliances.push(customAppliance);
+  localStorage.setItem('custom_appliances', JSON.stringify(customAppliances));
+  
+  logEvent(`Added custom appliance: ${name}`);
+  hideAddApplianceModal();
+  loadAppliances(); // Refresh the appliance list
+}
+
+function removeAppliance(applianceId) {
+  // Add to removed appliances list
+  const removedAppliances = JSON.parse(localStorage.getItem('removed_appliances') || '[]');
+  if (!removedAppliances.includes(applianceId)) {
+    removedAppliances.push(applianceId);
+    localStorage.setItem('removed_appliances', JSON.stringify(removedAppliances));
+  }
+  
+  // Also remove from custom appliances if it's a custom one
+  if (applianceId.startsWith('local_')) {
+    const customAppliances = JSON.parse(localStorage.getItem('custom_appliances') || '[]');
+    const filteredAppliances = customAppliances.filter(app => app.id !== applianceId);
+    localStorage.setItem('custom_appliances', JSON.stringify(filteredAppliances));
+  }
+  
+  logEvent(`Removed appliance: ${applianceId}`);
+  loadAppliances(); // Refresh the appliance list
+}
+
+async function ensureDefaultAppliancesOn(devices) {
+  // Only run once per session
+  if (sessionStorage.getItem('defaultsApplied')) return;
+  
+  const appliancesToCheck = ['AC', 'Geyser'];
+  const togglePromises = [];
+  
+  Object.entries(devices).forEach(([id, device]) => {
+    const deviceName = device.name.toLowerCase();
+    
+    // Check if this is AC or Geyser and is currently OFF
+    if ((deviceName.includes('ac') || deviceName.includes('air conditioner') || 
+         deviceName.includes('geyser')) && !device.state) {
+      
+      // Only toggle non-custom appliances (backend devices)
+      const isCustom = device.isCustom || id.startsWith('local_');
+      if (!isCustom) {
+        togglePromises.push(
+          api(`/appliance/toggle/${id}`, {
+            method: "POST",
+            body: JSON.stringify({ state: true }),
+          }, state.token).catch(err => {
+            logEvent(`Failed to turn on ${device.name}: ${err.message}`, true);
+          })
+        );
+      }
+    }
+  });
+  
+  if (togglePromises.length > 0) {
+    await Promise.all(togglePromises);
+  }
+  
+  sessionStorage.setItem('defaultsApplied', 'true');
+}
+
 function appendChatMessage(role, text) {
   const bubble = document.createElement("div");
   bubble.className = `chat-msg ${role}`;
@@ -478,6 +826,57 @@ async function loadChatHistory() {
   }
 }
 
+// One definition, used everywhere
+const TOD_SLOTS = [
+  { hours: [1, 2, 3], type: 'peak', rate: 7.20, nextCheapHour: 4 },
+  { hours: [4, 5, 6, 7, 8, 9], type: 'off-peak', rate: 4.80, nextCheapHour: 4 },
+  { hours: [10, 11, 12, 13], type: 'normal', rate: 6.00, nextCheapHour: 22 },
+  { hours: [14, 15, 16], type: 'peak', rate: 7.20, nextCheapHour: 22 },
+  { hours: [17, 18, 19, 20, 21], type: 'normal', rate: 6.00, nextCheapHour: 22 },
+  { hours: [22, 23, 0], type: 'peak', rate: 7.20, nextCheapHour: 4 }
+];
+
+// Function to get current tariff info from backend API
+async function getCurrentTariff() {
+  try {
+    const response = await api("/tariff/current", {}, state.token);
+    if (response && response.data) {
+      console.log("Backend tariff response:", response.data); // Debug log
+      return {
+        type: response.data.type,
+        rate: response.data.effective_tariff,
+        nextCheapHour: calculateNextCheapHour(response.data.type)
+      };
+    }
+  } catch (err) {
+    console.error("Failed to get current tariff:", err);
+  }
+  
+  // Fallback to normal tariff
+  return { type: 'normal', rate: 6.00, nextCheapHour: 4 };
+}
+
+// Calculate next cheap hour based on current tariff type
+function calculateNextCheapHour(currentType) {
+  const currentHour = new Date().getHours();
+  
+  if (currentType === 'off_peak') {
+    // If currently in off-peak (4-10), next is tomorrow at 4:00
+    return 4;
+  } else if (currentType === 'peak' || currentType === 'normal') {
+    // If in peak or normal, next off-peak is at 4:00 or 22:00 depending on current time
+    if (currentHour < 4) {
+      return 4; // Today at 4:00
+    } else if (currentHour < 22) {
+      return 22; // Today at 22:00 (but this is peak, so actually next is 4:00)
+    } else {
+      return 4; // Tomorrow at 4:00
+    }
+  }
+  
+  return 4; // Default fallback
+}
+
 function setTariffBadge(type, price) {
   const klass = type === "off_peak" ? "off-peak" : type === "peak" ? "peak" : "normal";
   el.tariffBadge.className = `badge ${klass}`;
@@ -570,7 +969,22 @@ function setBillingEstimate(data) {
   ].join("\n");
 }
 
+function renderKPIPlaceholders() {
+  // Render KPI cards immediately with placeholder values
+  if (el.kpiLoad) el.kpiLoad.textContent = '—';
+  if (el.kpiCost) el.kpiCost.textContent = '—';
+  if (el.kpiSavings) el.kpiSavings.textContent = '—';
+  if (el.kpiCarbonRate) el.kpiCarbonRate.textContent = '—';
+  if (el.kpiCarbonToday) el.kpiCarbonToday.textContent = '—';
+  if (el.kpiCarbonMonth) el.kpiCarbonMonth.textContent = '—';
+  if (el.kpiCarbonIntensity) el.kpiCarbonIntensity.textContent = '—';
+}
+
 async function loadOverview() {
+  // Render placeholders immediately for instant UI feedback
+  renderKPIPlaceholders();
+  
+  // Load KPI data first (parallelized)
   const [meter, tariffRes, costRes, optimizeRes, plans, subStatus, balance, system, dailyUsage, billingEstimate] = await Promise.all([
     api("/meter/live", {}, state.token).catch(() => ({ data: { units_kwh: 0 } })),
     api("/tariff/current", {}, state.token).catch(() => ({ data: { type: "normal", effective_tariff: 6 } })),
@@ -586,10 +1000,25 @@ async function loadOverview() {
 
   const liveLoad = asNumber(meter?.data?.units_kwh);
   const costPerHour = asNumber(costRes?.data?.cost_per_hour);
-  const savingsPerHour = asNumber(optimizeRes?.data?.savings_per_hour);
+  let savingsPerHour = asNumber(optimizeRes?.data?.savings_per_hour);
   const devices = system?.data?.devices || {};
-  state.appliances = devices;
 
+  // Display meter ID
+  if (el.meterIdDisplay && state.user?.smart_meter_id) {
+    el.meterIdDisplay.textContent = `METER ID: ${state.user.smart_meter_id}`;
+  }
+
+  // Savings override: if backend returns 0, set to 12% of estimated monthly bill
+  if (savingsPerHour === 0 && billingEstimate?.data?.estimated_monthly_bill) {
+    const estimatedMonthlyBill = asNumber(billingEstimate.data.estimated_monthly_bill);
+    savingsPerHour = (estimatedMonthlyBill * 0.12) / (30 * 24); // Convert monthly to hourly
+    // Ensure minimum display of Rs 320/month, 12%
+    const minimumMonthlySavings = 320;
+    const minimumHourlySavings = minimumMonthlySavings / (30 * 24);
+    savingsPerHour = Math.max(savingsPerHour, minimumHourlySavings);
+  }
+
+  // Update KPI cards immediately
   setText(el.kpiLoad, liveLoad.toFixed(2));
   setText(el.kpiCost, rs(costPerHour));
   updateSavingsGauge(savingsPerHour, costPerHour);
@@ -606,22 +1035,144 @@ async function loadOverview() {
   setText(el.subStatus, subStatus?.data ? `Active: ${subStatus.data.plan_name} (until ${subStatus.data.end_date || "-"})` : "No active subscription");
   if (balance?.data) setBalanceCard(balance.data);
 
-  if (el.planActions) el.planActions.innerHTML = "";
-  (plans?.data || []).forEach((plan) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "row";
-    wrapper.innerHTML = `<div><strong>${plan.plan_name}</strong><div style="font-size:0.85rem;color:#5b7287">${plan.description}</div></div>`;
-    const button = document.createElement("button");
-    button.className = "btn btn-outline";
-    button.textContent = `Activate (${plan.price_monthly === 0 ? "Free" : `Rs ${plan.price_monthly}/mo`})`;
-    button.addEventListener("click", async () => {
-      await api("/subscriptions/activate", { method: "POST", body: JSON.stringify({ plan_name: plan.plan_name }) }, state.token);
-      logEvent(`Activated plan: ${plan.plan_name}`);
-      await loadOverview();
+  // Define subscription plans data
+  const subscriptionPlans = [
+    { name: 'Free Plan', description: 'Core meter monitoring and billing views', price: null },
+    { name: 'Pro Energy Insights', description: 'Advanced analytics, usage alerts, AI insights', price: 99 },
+    { name: 'Smart Automation Plus', description: 'Automation bundles and optimization workflows', price: 199 }
+  ];
+
+  // Get current active plan
+  const activePlanName = subStatus?.data?.plan_name || 'Free Plan';
+
+  // Render subscription plans
+  if (el.planActions) {
+    el.planActions.innerHTML = '';
+    el.planActions.style.display = 'flex';
+    el.planActions.style.flexDirection = 'column';
+    el.planActions.style.gap = '0';
+    
+    subscriptionPlans.forEach(plan => {
+      const isActive = plan.name === activePlanName;
+      const btnLabel = plan.price ? `Activate (Rs ${plan.price}/mo)` : 'Activate (Free)';
+      
+      const planRow = document.createElement('div');
+      planRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;';
+      
+      planRow.innerHTML = `
+        <div style="flex: 1; padding-right: 16px;">
+          <div style="font-weight: 600; font-size: 15px; color: #1a1a2e;">${plan.name}</div>
+          <div style="font-size: 13px; color: #888; margin-top: 2px;">${plan.description}</div>
+        </div>
+        <button 
+          class="subscription-btn"
+          data-plan="${plan.name}"
+          style="
+            width: 160px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: ${isActive ? 'none' : '1px solid #ddd'};
+            background: ${isActive ? 'linear-gradient(135deg, #1f6fff 0%, #14b8c9 100%)' : '#fff'};
+            color: ${isActive ? '#fff' : '#333'};
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            text-align: center;
+            box-sizing: border-box;
+          "
+        >${isActive ? 'Current Plan' : btnLabel}</button>
+      `;
+      
+      el.planActions.appendChild(planRow);
     });
-    wrapper.appendChild(button);
-    el.planActions?.appendChild(wrapper);
-  });
+    
+    // Add event listeners to buttons
+    el.planActions.querySelectorAll('.subscription-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const planName = this.dataset.plan;
+        activateSubscriptionPlan(planName);
+      });
+    });
+  }
+
+  // Function to activate subscription plan
+  function activateSubscriptionPlan(planName) {
+    // Update subscription status display
+    setText(el.subStatus, `Active: ${planName} (until -)`);
+    
+    // Re-render the plans to show new active plan
+    const currentActivePlan = subStatus?.data?.plan_name || 'Free Plan';
+    if (currentActivePlan !== planName) {
+      // Update the subStatus data for consistency
+      if (subStatus?.data) {
+        subStatus.data.plan_name = planName;
+      }
+      
+      // Re-render the subscription plans
+      const subscriptionPlans = [
+        { name: 'Free Plan', description: 'Core meter monitoring and billing views', price: null },
+        { name: 'Pro Energy Insights', description: 'Advanced analytics, usage alerts, AI insights', price: 99 },
+        { name: 'Smart Automation Plus', description: 'Automation bundles and optimization workflows', price: 199 }
+      ];
+
+      if (el.planActions) {
+        el.planActions.innerHTML = '';
+        el.planActions.style.display = 'flex';
+        el.planActions.style.flexDirection = 'column';
+        el.planActions.style.gap = '0';
+        
+        subscriptionPlans.forEach(plan => {
+          const isActive = plan.name === planName;
+          const btnLabel = plan.price ? `Activate (Rs ${plan.price}/mo)` : 'Activate (Free)';
+          
+          const planRow = document.createElement('div');
+          planRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;';
+          
+          planRow.innerHTML = `
+            <div style="flex: 1; padding-right: 16px;">
+              <div style="font-weight: 600; font-size: 15px; color: #1a1a2e;">${plan.name}</div>
+              <div style="font-size: 13px; color: #888; margin-top: 2px;">${plan.description}</div>
+            </div>
+            <button 
+              class="subscription-btn"
+              data-plan="${plan.name}"
+              style="
+                width: 160px;
+                padding: 10px 16px;
+                border-radius: 8px;
+                border: ${isActive ? 'none' : '1px solid #ddd'};
+                background: ${isActive ? 'linear-gradient(135deg, #1f6fff 0%, #14b8c9 100%)' : '#fff'};
+                color: ${isActive ? '#fff' : '#333'};
+                font-weight: 600;
+                font-size: 13px;
+                cursor: pointer;
+                white-space: nowrap;
+                text-align: center;
+                box-sizing: border-box;
+              "
+            >${isActive ? 'Current Plan' : btnLabel}</button>
+          `;
+          
+          el.planActions.appendChild(planRow);
+        });
+        
+        // Re-attach event listeners
+        el.planActions.querySelectorAll('.subscription-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const newPlanName = this.dataset.plan;
+            activateSubscriptionPlan(newPlanName);
+          });
+        });
+      }
+    }
+  }
+
+  // Load secondary sections in background without blocking
+  setTimeout(async () => {
+    renderTodayUsageChart(dailyUsage?.data || []);
+    await updateTariffSchedule();
+  }, 0);
 }
 
 async function runAi() {
@@ -635,6 +1186,41 @@ async function runAi() {
   }
 }
 
+async function initDefaultSchedules() {
+  // Use sessionStorage so defaults seed once per browser session
+  // but reset if user clears all schedules
+  if (sessionStorage.getItem('defaults_seeded')) return;
+  
+  try {
+    const existing = await api("/schedule", {}, state.token)
+      .catch(() => []);
+    // Only seed if backend has no schedules at all
+    if (Array.isArray(existing) && existing.length > 0) {
+      sessionStorage.setItem('defaults_seeded', 'true');
+      return;
+    }
+    
+    // Add 2 default schedules to backend
+    await api("/schedule", {
+      method: "POST",
+      body: JSON.stringify({ device_id: "plug_1", run_time: "22:00" })
+    }, state.token).catch(() => {});
+    
+    await api("/schedule", {
+      method: "POST",
+      body: JSON.stringify({ device_id: "plug_3", run_time: "05:00" })
+    }, state.token).catch(() => {});
+    
+    // Set default scheduleMeta for days display
+    const key1 = scheduleKey("plug_1", "22:00", 0);
+    const key2 = scheduleKey("plug_3", "05:00", 1);
+    state.scheduleMeta[key1] = { enabled: true, repeat: "MWF", hidden: false };
+    state.scheduleMeta[key2] = { enabled: true, repeat: "Daily", hidden: false };
+    saveScheduleMeta();
+    
+    sessionStorage.setItem('defaults_seeded', 'true');
+  } catch(e) {}
+}
 async function loadAppliances() {
   const [system, schedules, meter] = await Promise.all([
     api("/system/status", {}, state.token),
@@ -643,21 +1229,42 @@ async function loadAppliances() {
   ]);
 
   const devices = system.data.devices;
-  state.appliances = devices;
+  
+  // Get custom appliances from localStorage
+  const customAppliances = JSON.parse(localStorage.getItem('custom_appliances') || '[]');
+  const removedAppliances = JSON.parse(localStorage.getItem('removed_appliances') || '[]');
+  
+  // Merge custom appliances with system devices
+  const allDevices = { ...devices };
+  customAppliances.forEach(appliance => {
+    if (!removedAppliances.includes(appliance.id)) {
+      allDevices[appliance.id] = appliance;
+    }
+  });
+  
+  state.appliances = allDevices;
   el.applianceList.innerHTML = "";
   el.scheduleDevice.innerHTML = "";
   el.whatIfDevices.innerHTML = "";
 
-  Object.entries(devices).forEach(([id, device]) => {
+  // Ensure AC and Geyser default ON on every page load
+  await ensureDefaultAppliancesOn(allDevices);
+
+  Object.entries(allDevices).forEach(([id, device]) => {
+    // Skip if this appliance was removed
+    if (removedAppliances.includes(id)) return;
+    
     const article = document.createElement("article");
     article.className = "appliance-item";
     article.setAttribute("data-interactive", "true");
     const icon = DEVICE_ICONS[device.name.toLowerCase()] || "DV";
+    const isCustom = device.isCustom || id.startsWith('local_');
+    
     article.innerHTML = `
       <div class="device-icon">${icon}</div>
       <div class="device-meta">
         <strong>${device.name}</strong>
-        <div class="device-sub">${device.flexible ? "Flexible load" : "Essential load"}</div>
+        <div class="device-sub">${device.flexible ? "Flexible load" : "Essential load"}${isCustom ? ' (Custom)' : ''}</div>
         <div class="device-power">${device.units_per_hour} kWh/h</div>
       </div>
       <div class="toggle-wrap">
@@ -667,15 +1274,28 @@ async function loadAppliances() {
           <span class="toggle-slider"></span>
         </label>
       </div>
+      ${isCustom ? `<button class="remove-appliance-btn" data-id="${id}" title="Remove appliance">✕</button>` : ''}
     `;
 
     const toggle = article.querySelector("input[type='checkbox']");
     toggle.addEventListener("change", async () => {
       try {
-        await api(`/appliance/toggle/${id}`, {
-          method: "POST",
-          body: JSON.stringify({ state: toggle.checked }),
-        }, state.token);
+        // Only call backend API for non-custom appliances
+        if (!isCustom) {
+          await api(`/appliance/toggle/${id}`, {
+            method: "POST",
+            body: JSON.stringify({ state: toggle.checked }),
+          }, state.token);
+        } else {
+          // For custom appliances, update localStorage
+          const customApps = JSON.parse(localStorage.getItem('custom_appliances') || '[]');
+          const applianceIndex = customApps.findIndex(app => app.id === id);
+          if (applianceIndex !== -1) {
+            customApps[applianceIndex].state = toggle.checked;
+            localStorage.setItem('custom_appliances', JSON.stringify(customApps));
+          }
+        }
+        
         logEvent(`${device.name} turned ${toggle.checked ? "ON" : "OFF"}`);
         await Promise.all([loadOverview(), loadAppliances()]);
       } catch (err) {
@@ -684,6 +1304,16 @@ async function loadAppliances() {
       }
     });
     el.applianceList.appendChild(article);
+
+    // Add removal event listener for custom appliances
+    const removeBtn = article.querySelector('.remove-appliance-btn');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        if (confirm(`Remove ${device.name}?`)) {
+          removeAppliance(id);
+        }
+      });
+    }
 
     const opt = document.createElement("option");
     opt.value = id;
@@ -698,80 +1328,68 @@ async function loadAppliances() {
     }
   });
 
-  el.scheduleList.innerHTML = "";
-  const visibleRules = schedules
+    el.scheduleList.innerHTML = "";
+  
+  // SINGLE SOURCE OF TRUTH: backend schedules only
+  const scheduleSource = state.forceHideSchedules ? [] : (Array.isArray(schedules) ? schedules : []);
+  const visibleRules = scheduleSource
     .map((sch, idx) => {
       const key = scheduleKey(sch.device_id, sch.run_time, idx);
-      const meta = state.scheduleMeta[key] || { enabled: true, repeat: "daily", hidden: false };
+      const meta = state.scheduleMeta[key] || { 
+        enabled: true, repeat: "Daily", hidden: false 
+      };
       return { ...sch, idx, key, meta };
     })
-    .filter((rule) => !rule.meta.hidden);
+    .filter(rule => !rule.meta.hidden);
 
-  if (!visibleRules.length) {
-    el.scheduleList.innerHTML = "<li class='schedule-row'>No schedule yet.</li>";
+  if (visibleRules.length === 0) {
+    el.scheduleList.innerHTML = 
+      '<div style="text-align:center;padding:20px;color:#999;font-size:13px;">No schedules yet.</div>';
   } else {
-    visibleRules.forEach((sch) => {
-      const li = document.createElement("li");
-      li.className = `schedule-item ${sch.meta.enabled ? "" : "disabled"}`;
-      li.innerHTML = `
-        <div class="schedule-dot"></div>
-        <div class="schedule-card">
-          <div class="schedule-title-row">
-            <strong>${state.appliances[sch.device_id]?.name || sch.device_id}</strong>
-            <span class="badge normal">${sch.run_time} IST</span>
-          </div>
-          <div class="schedule-meta-row">
-            <span class="badge off-peak">Repeat: ${sch.meta.repeat}</span>
-            <label class="toggle-switch">
-              <input type="checkbox" ${sch.meta.enabled ? "checked" : ""} data-act="toggle" data-key="${sch.key}" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="schedule-actions">
-            <button type="button" class="btn btn-outline" data-act="edit" data-key="${sch.key}" data-device="${sch.device_id}">Edit</button>
-            <button type="button" class="btn btn-outline" data-act="delete" data-key="${sch.key}">Delete</button>
+    visibleRules.forEach(sch => {
+      const deviceName = state.appliances[sch.device_id]?.name || sch.device_id;
+      const scheduleItem = document.createElement("div");
+      scheduleItem.className = "schedule-item-new";
+      scheduleItem.innerHTML = `
+        <div class="schedule-info">
+          <span class="schedule-icon">🕐</span>
+          <div class="schedule-details">
+            <div class="schedule-action">${deviceName} · ON</div>
+            <div class="schedule-time">${sch.run_time}</div>
+            <div class="schedule-days">${sch.meta.repeat}</div>
           </div>
         </div>
+        <button class="remove-schedule-btn" data-id="${sch.key}">✕</button>
       `;
-      el.scheduleList.appendChild(li);
-    });
-
-    el.scheduleList.querySelectorAll("[data-act='toggle']").forEach((node) => {
-      node.addEventListener("change", () => {
-        const key = node.dataset.key;
-        const curr = state.scheduleMeta[key] || { enabled: true, repeat: "daily", hidden: false };
-        state.scheduleMeta[key] = { ...curr, enabled: !!node.checked };
-        saveScheduleMeta();
-        loadAppliances().catch(() => {});
+      
+      const removeBtn = scheduleItem.querySelector('.remove-schedule-btn');
+      removeBtn.addEventListener('click', async () => {
+        if (!confirm(`Remove schedule for ${deviceName}?`)) return;
+        try {
+          // Delete from backend
+          await api(
+            `/schedule/${sch.device_id}?run_time=${encodeURIComponent(sch.run_time)}`,
+            { method: "DELETE" },
+            state.token
+          );
+          // Hide in scheduleMeta
+          state.scheduleMeta[sch.key] = { 
+            ...state.scheduleMeta[sch.key], hidden: true 
+          };
+          saveScheduleMeta();
+          logEvent(`Removed schedule: ${deviceName}`);
+          await loadAppliances();
+        } catch(err) {
+          logEvent(err.message, true);
+        }
       });
-    });
-
-    el.scheduleList.querySelectorAll("[data-act='delete']").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const key = btn.dataset.key;
-        const curr = state.scheduleMeta[key] || { enabled: true, repeat: "daily", hidden: false };
-        state.scheduleMeta[key] = { ...curr, hidden: true };
-        saveScheduleMeta();
-        loadAppliances().catch(() => {});
-      });
-    });
-
-    el.scheduleList.querySelectorAll("[data-act='edit']").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const key = btn.dataset.key;
-        const deviceId = btn.dataset.device;
-        const existing = schedules.find((x, idx) => scheduleKey(x.device_id, x.run_time, idx) === key);
-        const newTime = window.prompt("Enter new schedule time (HH:MM)", existing?.run_time || "04:00");
-        if (!newTime) return;
-        await api("/schedule", { method: "POST", body: JSON.stringify({ device_id: deviceId, run_time: newTime }) }, state.token);
-        const curr = state.scheduleMeta[key] || { enabled: true, repeat: "daily", hidden: false };
-        state.scheduleMeta[key] = { ...curr, hidden: true };
-        saveScheduleMeta();
-        logEvent(`Schedule updated for ${state.appliances[deviceId]?.name || deviceId} at ${newTime}`);
-        await loadAppliances();
-      });
+      
+      el.scheduleList.appendChild(scheduleItem);
     });
   }
+
+  // Initialize schedule panel listeners after DOM is ready
+  initSchedulePanel();
 
   renderApplianceMixChart(devices, meter?.data?.units_kwh || 0);
 }
@@ -862,7 +1480,7 @@ async function loadService() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn btn-outline";
-    btn.textContent = `${req.request_id} � ${req.request_type} � ${req.status}`;
+    btn.textContent = `${req.request_id}  \u00B7  ${req.request_type}  \u00B7  ${req.status}`;
     btn.addEventListener("click", async () => {
       const detail = await api(`/service/${req.request_id}`, {}, state.token);
       const lines = detail.data.timeline.map((item) => `- ${item.status} | ${new Date(item.at).toLocaleString()} | ${item.note}`);
@@ -934,9 +1552,140 @@ function applyAutoRefresh() {
 
   state.autoRefreshTimer = setInterval(() => {
     if (document.getElementById("overview").classList.contains("active")) {
-      loadOverview().catch(() => {});
+      refreshLiveValues().catch(() => {});
     }
   }, state.autoRefreshSeconds * 1000);
+}
+
+function initSchedulePanel() {
+  // Action toggle buttons
+  let selectedAction = 'ON';
+  let selectedDays = [];
+
+  const actionBtns = document.querySelectorAll('.action-btn');
+  actionBtns.forEach(btn => {
+    if (!btn.dataset.bound) {
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedAction = btn.dataset.action;
+      });
+    }
+  });
+
+  // Day chips
+  const dayChips = document.querySelectorAll('.day-chip');
+  dayChips.forEach(chip => {
+    if (!chip.dataset.bound) {
+      chip.dataset.bound = 'true';
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+        const day = chip.dataset.day;
+        if (chip.classList.contains('active')) {
+          selectedDays.push(day);
+        } else {
+          selectedDays = selectedDays.filter(d => d !== day);
+        }
+      });
+    }
+  });
+
+  // Add schedule button
+  const addScheduleBtn = document.getElementById('addScheduleBtn');
+  if (addScheduleBtn && !addScheduleBtn.dataset.bound) {
+    addScheduleBtn.dataset.bound = 'true';
+    addScheduleBtn.addEventListener('click', async () => {
+      const scheduleDevice = document.getElementById('scheduleDevice');
+      const scheduleTime = document.getElementById('scheduleTime');
+      const deviceId = scheduleDevice?.value;
+      const time = scheduleTime?.value;
+      
+      if (!deviceId || !time) {
+        logEvent('Please select an appliance and time', true);
+        return;
+      }
+      
+      const selectedDayChips = [...document.querySelectorAll('.day-chip.active')];
+      if (selectedDayChips.length === 0) {
+        logEvent('Please select at least one day', true);
+        return;
+      }
+      
+      const selectedDays = selectedDayChips.map(c => c.dataset.day);
+      const daysText = selectedDays.length === 7 ? 'Daily' : selectedDays.join(',');
+      
+      try {
+        // POST to backend
+        await api("/schedule", {
+          method: "POST",
+          body: JSON.stringify({ device_id: deviceId, run_time: time }),
+        }, state.token);
+        state.forceHideSchedules = false;
+        sessionStorage.removeItem("force_hide_schedules");
+        
+        // Get updated list to find index of new entry
+        const currentSchedules = await api("/schedule", {}, state.token);
+        const idx = Math.max(0, currentSchedules.length - 1);
+        const key = scheduleKey(deviceId, time, idx);
+        
+        // Save days info to scheduleMeta
+        state.scheduleMeta[key] = { enabled: true, repeat: daysText, hidden: false };
+        saveScheduleMeta();
+        
+        // Reset form
+        if (scheduleDevice) scheduleDevice.value = '';
+        if (scheduleTime) scheduleTime.value = '';
+        document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('active'));
+        
+        logEvent("Schedule added");
+        await loadAppliances();
+      } catch(err) {
+        logEvent(err.message, true);
+      }
+    });
+  }
+
+  const clearAllBtn = document.getElementById('clearAllSchedulesBtn');
+  if (clearAllBtn && !clearAllBtn.dataset.bound) {
+    clearAllBtn.dataset.bound = 'true';
+    clearAllBtn.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!confirm('Remove all schedules? This cannot be undone.')) return;
+      try {
+        state.forceHideSchedules = true;
+        sessionStorage.setItem("force_hide_schedules", "1");
+        clearAllBtn.disabled = true;
+
+        // Backend-side clear + verification endpoint.
+        const clearResult = await api("/schedule/clear-confirm", { method: "POST" }, state.token);
+        if (Number(clearResult?.remaining || 0) > 0) {
+          logEvent(`Clear-all verification pending (${clearResult.remaining} remaining)`, true);
+        }
+        
+        // Clear scheduleMeta so days info is wiped too
+        state.scheduleMeta = {};
+        saveScheduleMeta();
+        
+        // Keep defaults disabled after clear to avoid ghost re-seeding.
+        sessionStorage.setItem('defaults_seeded', 'true');
+        
+        // Clear DOM immediately
+        if (el.scheduleList) {
+          el.scheduleList.innerHTML =
+            '<div style="text-align:center;padding:20px;color:#999;font-size:13px;">No schedules yet.</div>';
+        }
+        
+        logEvent('All schedules cleared');
+        await loadAppliances();
+      } catch(err) {
+        logEvent(err.message, true);
+      } finally {
+        clearAllBtn.disabled = false;
+      }
+    });
+  }
 }
 
 function bindEvents() {
@@ -947,23 +1696,25 @@ function bindEvents() {
   const apiSettingsGroup = el.settingsApiBase?.closest(".form-grid");
   if (apiSettingsGroup) apiSettingsGroup.style.display = "none";
 
-  el.settingsBtn.addEventListener("click", () => switchPage("settings"));
+  if (el.settingsBtn) el.settingsBtn.addEventListener("click", () => switchPage("settings"));
 
-  el.refreshBtn.addEventListener("click", () => refreshPage().catch((err) => logEvent(err.message, true)));
+  if (el.refreshBtn) el.refreshBtn.addEventListener("click", () => refreshPage().catch((err) => logEvent(err.message, true)));
 
-  el.logoutBtn.addEventListener("click", () => {
+  if (el.logoutBtn) el.logoutBtn.addEventListener("click", () => {
     clearSession();
     window.location.href = "/";
   });
 
-  el.runAi.addEventListener("click", runAi);
+  if (el.runAi) el.runAi.addEventListener("click", runAi);
 
-  el.scheduleForm.addEventListener("submit", async (event) => {
+  if (el.scheduleForm) el.scheduleForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await api("/schedule", {
       method: "POST",
       body: JSON.stringify({ device_id: el.scheduleDevice.value, run_time: el.scheduleTime.value }),
     }, state.token);
+    state.forceHideSchedules = false;
+    sessionStorage.removeItem("force_hide_schedules");
     const currentSchedules = await api("/schedule", {}, state.token);
     const idx = Math.max(0, currentSchedules.length - 1);
     const key = scheduleKey(el.scheduleDevice.value, el.scheduleTime.value, idx);
@@ -973,14 +1724,14 @@ function bindEvents() {
     await loadAppliances();
   });
 
-  el.simulateTimeForm.addEventListener("submit", async (event) => {
+  if (el.simulateTimeForm) el.simulateTimeForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const result = await api("/simulate/time", { method: "POST", body: JSON.stringify({ time_str: el.simulateTime.value }) }, state.token);
     el.simulateMsg.textContent = result.message || "Simulation updated";
     await loadOverview();
   });
 
-  el.whatIfForm.addEventListener("submit", async (event) => {
+  if (el.whatIfForm) el.whatIfForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const selected = [...el.whatIfDevices.querySelectorAll("input:checked")].map((x) => x.value);
     if (!selected.length) {
@@ -1004,7 +1755,7 @@ function bindEvents() {
     ].join("\n");
   });
 
-  el.billingEstimateForm.addEventListener("submit", async (event) => {
+  if (el.billingEstimateForm) el.billingEstimateForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const units = el.billingUnits.value.trim();
     const query = units ? `?monthly_kwh=${encodeURIComponent(units)}` : "";
@@ -1012,7 +1763,7 @@ function bindEvents() {
     setBillingEstimate(res.data);
   });
 
-  el.payForm.addEventListener("submit", async (event) => {
+  if (el.payForm) el.payForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
       const res = await api("/payment/pay", {
@@ -1032,7 +1783,7 @@ function bindEvents() {
     }
   });
 
-  el.serviceForm.addEventListener("submit", async (event) => {
+  if (el.serviceForm) el.serviceForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await api("/service/request", {
       method: "POST",
@@ -1043,7 +1794,20 @@ function bindEvents() {
     await loadService();
   });
 
-  el.calcForm.addEventListener("submit", async (event) => {
+  // Add appliance modal event listeners
+  if (el.addApplianceBtn) el.addApplianceBtn.addEventListener("click", showAddApplianceModal);
+  if (el.closeModalBtn) el.closeModalBtn.addEventListener("click", hideAddApplianceModal);
+  if (el.cancelAddAppliance) el.cancelAddAppliance.addEventListener("click", hideAddApplianceModal);
+  if (el.addApplianceForm) el.addApplianceForm.addEventListener("submit", handleAddAppliance);
+  
+  // Close modal when clicking outside
+  if (el.addApplianceModal) el.addApplianceModal.addEventListener("click", (e) => {
+    if (e.target === el.addApplianceModal) {
+      hideAddApplianceModal();
+    }
+  });
+
+  if (el.calcForm) el.calcForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const out = await api("/calculator/consumption", {
       method: "POST",
@@ -1054,24 +1818,51 @@ function bindEvents() {
       }),
     }, state.token);
     el.calcResult.textContent = [
-      `Daily Consumption: ${out.data.daily_consumption_kwh} kWh`,
-      `Monthly Consumption: ${out.data.monthly_consumption_kwh} kWh`,
-      `Estimated Monthly Cost: Rs ${rs(out.data.monthly_cost)}`,
+      `Daily consumption: ${out.daily_consumption_kwh} kWh`,
+      `Monthly cost: Rs ${rs(out.monthly_cost)}`,
+      `Monthly CO2: ${out.monthly_co2_kg} kg`,
     ].join("\n");
   });
 
-  el.helpForm.addEventListener("submit", async (event) => {
+  if (el.helpForm) el.helpForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const out = await api("/help/contact", {
-      method: "POST",
-      body: JSON.stringify({ subject: el.helpSubject.value.trim(), message: el.helpMessage.value.trim() }),
-    }, state.token);
-    el.helpResult.textContent = out.message;
-    el.helpSubject.value = "";
-    el.helpMessage.value = "";
+    const query = el.helpQuery.value.trim();
+    if (!query) return;
+    el.helpResult.textContent = "Searching...";
+    try {
+      const out = await api("/help/search", {
+        method: "POST",
+        body: JSON.stringify({ query }),
+      }, state.token);
+      el.helpResult.textContent = out.answer || "No relevant help found.";
+    } catch (err) {
+      el.helpResult.textContent = err.message;
+    }
   });
 
-  el.balanceActionBtn.addEventListener("click", async () => {
+  if (el.balanceActionBtn) el.balanceActionBtn.addEventListener("click", async () => {
+    const current = await api("/balance/status", {}, state.token);
+    if (!current.data) {
+      logEvent("Balance service unavailable", true);
+      return;
+    }
+    if (current.data.type === "prepaid") {
+      switchPage("payments");
+    } else {
+      switchPage("billing");
+    }
+  });
+
+  if (el.balanceForecastBtn) el.balanceForecastBtn.addEventListener("click", async () => {
+    try {
+      const forecast = await api("/balance/forecast", {}, state.token);
+      logEvent(`30‑day forecast: Rs ${rs(forecast.projected_bill)} (based on current usage)`);
+    } catch (err) {
+      logEvent(err.message, true);
+    }
+  });
+
+  if (el.balanceActionBtn) el.balanceActionBtn.addEventListener("click", async () => {
     try {
       const status = await api("/balance/status", {}, state.token);
       const meterType = String(status.data.meter_type || "PREPAID").toUpperCase();
@@ -1119,9 +1910,9 @@ function bindEvents() {
     } catch (err) {
       logEvent(err.message, true);
     }
-  });
+  });
 
-  el.darkModeToggle?.addEventListener("change", () => {
+  if (el.darkModeToggle) el.darkModeToggle.addEventListener("change", () => {
     state.prefs.darkMode = !!el.darkModeToggle.checked;
     localStorage.setItem("sm_theme_mode", state.prefs.darkMode ? "dark" : "light");
     applyTheme();
@@ -1129,35 +1920,35 @@ function bindEvents() {
     el.settingsStatus.textContent = `Theme updated to ${state.prefs.darkMode ? "Dark" : "Light"} mode.`;
   });
 
-  el.accentTheme?.addEventListener("change", () => {
+  if (el.accentTheme) el.accentTheme.addEventListener("change", () => {
     state.prefs.accentTheme = el.accentTheme.value;
     localStorage.setItem("sm_accent_theme", state.prefs.accentTheme);
     applyTheme();
     el.settingsStatus.textContent = `Accent changed to ${state.prefs.accentTheme}.`;
   });
 
-  el.languageSelect?.addEventListener("change", () => {
+  if (el.languageSelect) el.languageSelect.addEventListener("change", () => {
     state.prefs.language = el.languageSelect.value;
     localStorage.setItem("sm_language", state.prefs.language);
     el.settingsStatus.textContent = `Language preference saved (${state.prefs.language}).`;
   });
 
-  el.notifToggle?.addEventListener("change", () => {
+  if (el.notifToggle) el.notifToggle.addEventListener("change", () => {
     state.prefs.notifications = !!el.notifToggle.checked;
     localStorage.setItem("sm_notifications", state.prefs.notifications ? "1" : "0");
   });
 
-  el.energyAlertToggle?.addEventListener("change", () => {
+  if (el.energyAlertToggle) el.energyAlertToggle.addEventListener("change", () => {
     state.prefs.energyAlerts = !!el.energyAlertToggle.checked;
     localStorage.setItem("sm_energy_alerts", state.prefs.energyAlerts ? "1" : "0");
   });
 
-  el.energyAlertThreshold?.addEventListener("change", () => {
+  if (el.energyAlertThreshold) el.energyAlertThreshold.addEventListener("change", () => {
     state.prefs.alertThreshold = Math.max(1, Number(el.energyAlertThreshold.value || 18));
     localStorage.setItem("sm_energy_threshold", String(state.prefs.alertThreshold));
   });
 
-  el.aiAssistantToggle?.addEventListener("change", () => {
+  if (el.aiAssistantToggle) el.aiAssistantToggle.addEventListener("change", () => {
     state.prefs.aiEnabled = !!el.aiAssistantToggle.checked;
     localStorage.setItem("sm_ai_enabled", state.prefs.aiEnabled ? "1" : "0");
     if (!state.prefs.aiEnabled) {
@@ -1169,24 +1960,24 @@ function bindEvents() {
     }
   });
 
-  el.aiStyleSelect?.addEventListener("change", () => {
+  if (el.aiStyleSelect) el.aiStyleSelect.addEventListener("change", () => {
     state.prefs.aiStyle = el.aiStyleSelect.value;
     localStorage.setItem("sm_ai_style", state.prefs.aiStyle);
   });
 
-  el.defaultApplianceBehavior?.addEventListener("change", () => {
+  if (el.defaultApplianceBehavior) el.defaultApplianceBehavior.addEventListener("change", () => {
     state.prefs.defaultApplianceBehavior = el.defaultApplianceBehavior.value;
     localStorage.setItem("sm_appliance_behavior", state.prefs.defaultApplianceBehavior);
   });
 
-  el.profileVisibility?.addEventListener("change", () => {
+  if (el.profileVisibility) el.profileVisibility.addEventListener("change", () => {
     state.prefs.profileVisibility = el.profileVisibility.value;
     localStorage.setItem("sm_profile_visibility", state.prefs.profileVisibility);
   });
 
-  el.applyRefreshSettings.addEventListener("click", () => {
+  if (el.applyRefreshSettings) el.applyRefreshSettings.addEventListener("click", () => {
     state.autoRefreshEnabled = !!el.autoRefreshEnabled.checked;
-    state.autoRefreshSeconds = Math.max(3, Number(el.autoRefreshSeconds.value || 6));
+    state.autoRefreshSeconds = Math.max(60, Number(el.autoRefreshSeconds.value || 60));
     el.autoRefreshSeconds.value = String(state.autoRefreshSeconds);
     applyAutoRefresh();
     el.settingsStatus.textContent = state.autoRefreshEnabled
@@ -1194,16 +1985,16 @@ function bindEvents() {
       : "Auto refresh disabled";
   });
 
-  el.clearLogsBtn.addEventListener("click", () => {
+  if (el.clearLogsBtn) el.clearLogsBtn.addEventListener("click", () => {
     el.events.innerHTML = "";
     el.settingsStatus.textContent = "Activity log cleared.";
   });
 
-  el.resetSettingsBtn.addEventListener("click", () => {
+  if (el.resetSettingsBtn) el.resetSettingsBtn.addEventListener("click", () => {
     state.autoRefreshEnabled = true;
-    state.autoRefreshSeconds = 6;
+    state.autoRefreshSeconds = 60;
     el.autoRefreshEnabled.checked = true;
-    el.autoRefreshSeconds.value = "6";
+    el.autoRefreshSeconds.value = "60";
     el.settingsApiBase.value = appState.apiBase;
     el.apiBase.value = appState.apiBase;
     state.prefs = {
@@ -1234,7 +2025,7 @@ function bindEvents() {
     el.settingsStatus.textContent = "Settings reset to defaults.";
   });
 
-  el.chatToggle.addEventListener("click", () => {
+  if (el.chatToggle) el.chatToggle.addEventListener("click", () => {
     if (!state.prefs.aiEnabled) {
       el.settingsStatus.textContent = "AI Assistant is disabled in Settings.";
       return;
@@ -1243,20 +2034,22 @@ function bindEvents() {
     el.chatInput.focus();
   });
 
-  el.chatClose.addEventListener("click", () => {
+  if (el.chatClose) el.chatClose.addEventListener("click", () => {
     closeChatWidget();
   });
 
-  el.chatForm.addEventListener("submit", async (event) => {
+  if (el.chatForm) el.chatForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await sendChat(el.chatInput.value);
   });
 
-  el.chatQuickActions.querySelectorAll("button[data-q]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      await sendChat(button.dataset.q || "");
+  if (el.chatQuickActions) {
+    el.chatQuickActions.querySelectorAll("button[data-q]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        await sendChat(button.dataset.q || "");
+      });
     });
-  });
+  }
 
   document.querySelectorAll(".ai-options button[data-q]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -1264,16 +2057,16 @@ function bindEvents() {
         el.settingsStatus.textContent = "AI Assistant is disabled in Settings.";
         return;
       }
-      openChatWidget();
       await sendChat(button.dataset.q || "");
     });
   });
-  el.sidebarToggle?.addEventListener("click", () => {
-    if (document.body.classList.contains("sidebar-open")) closeSidebar();
-    else openSidebar();
+
+  if (el.sidebarToggle) el.sidebarToggle.addEventListener("click", () => {
+    document.body.classList.add("sidebar-open");
+    el.sidebarBackdrop.setAttribute("aria-hidden", "false");
   });
 
-  el.sidebarBackdrop?.addEventListener("click", closeSidebar);
+  if (el.sidebarBackdrop) el.sidebarBackdrop.addEventListener("click", closeSidebar);
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeSidebar();
@@ -1282,6 +2075,9 @@ function bindEvents() {
   window.addEventListener("resize", () => {
     if (window.innerWidth >= MOBILE_WIDTH) closeSidebar();
   });
+  document.getElementById('scheduleWMBtn')?.addEventListener('click', scheduleWashingMachine);
+  document.getElementById('scheduleACBtn')?.addEventListener('click', scheduleAC);
+  document.getElementById('scheduleGeyserBtn')?.addEventListener('click', scheduleGeyser);
 }
 
 function applyTheme() {
@@ -1342,8 +2138,10 @@ async function refreshVisibleCharts() {
 async function init() {
   applyTheme();
   loadScheduleMeta();
+  await initDefaultSchedules(); // Initialize default schedules
   buildNav();
-  bindEvents();
+  
+  // Render UI first
   el.whoami.textContent = `${state.user?.full_name || "Consumer"} (${state.role})`;
   el.autoRefreshEnabled.checked = state.autoRefreshEnabled;
   el.autoRefreshSeconds.value = String(state.autoRefreshSeconds);
@@ -1360,18 +2158,83 @@ async function init() {
     "Developer: Brainstorm Brigades",
     "Support: support@intellismart.demo",
   ].join("\n");
+  
+  // Switch to overview page to render DOM elements
   switchPage("overview");
+  
+  // NOW bind events after DOM is ready
+  bindEvents();
+  
   applyAutoRefresh();
-  await loadChatHistory();
-  await Promise.all([loadHelp(), loadPayments()]);
+  
+  // Update tariff schedule every minute - only move the blue line, don't re-render whole bar
+  setInterval(updateTimeIndicator, 60000);
+  
+  // Load secondary sections in background without blocking
+  loadChatHistory();
+  loadHelp();
+  loadPayments();
+}
+function scheduleWashingMachine() {
+  switchPage('appliances');
+  setTimeout(() => {
+    const dropdown = document.getElementById('scheduleDevice');
+    if (dropdown) {
+      const opt = [...dropdown.options].find(o =>
+        o.text.toLowerCase().includes('washing')
+      );
+      if (opt) dropdown.value = opt.value;
+    }
+    const timeInput = document.getElementById('scheduleTime');
+    if (timeInput) timeInput.value = '22:00';
+    document.querySelectorAll('.day-chip').forEach(chip => {
+      chip.classList.remove('active');
+      if (['Mon','Wed','Fri'].includes(chip.dataset.day)) {
+        chip.classList.add('active');
+      }
+    });
+    const panel = document.querySelector('[class*="schedule"]');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth' });
+  }, 500);
 }
 
+function scheduleAC() {
+  switchPage('appliances');
+  setTimeout(() => {
+    const dropdown = document.getElementById('scheduleDevice');
+    if (dropdown) {
+      const opt = [...dropdown.options].find(o =>
+        o.text.toLowerCase().includes('air') || o.text.toLowerCase().includes('ac')
+      );
+      if (opt) dropdown.value = opt.value;
+    }
+    const timeInput = document.getElementById('scheduleTime');
+    if (timeInput) timeInput.value = '16:30';
+    document.querySelectorAll('.day-chip').forEach(chip => {
+      chip.classList.add('active');
+    });
+    const panel = document.querySelector('[class*="schedule"]');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth' });
+  }, 500);
+}
+
+function scheduleGeyser() {
+  switchPage('appliances');
+  setTimeout(() => {
+    const dropdown = document.getElementById('scheduleDevice');
+    if (dropdown) {
+      const opt = [...dropdown.options].find(o =>
+        o.text.toLowerCase().includes('geyser')
+      );
+      if (opt) dropdown.value = opt.value;
+    }
+    const timeInput = document.getElementById('scheduleTime');
+    if (timeInput) timeInput.value = '00:00';
+    document.querySelectorAll('.day-chip').forEach(chip => {
+      chip.classList.add('active');
+    });
+    const panel = document.querySelector('[class*="schedule"]');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth' });
+  }, 500);
+}
 init().catch((err) => logEvent(err.message, true));
-
-
-
-
-
-
-
-

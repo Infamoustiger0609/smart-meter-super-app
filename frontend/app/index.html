@@ -48,7 +48,7 @@
       <main class="main">
         <section id="overview" class="page active fade-in">
           <div class="kpi-grid">
-            <article class="kpi"><span>Live Load</span><strong id="kpiLoad">--</strong><small>kWh/h</small></article>
+            <article class="kpi"><span>Live Load</span><div id="meterIdDisplay" style="font-size: 11px; color: #999; margin-bottom: 4px;">METER ID: --</div><strong id="kpiLoad">--</strong><small>kWh/h</small></article>
             <article class="kpi kpi-carbon">
               <div class="row" style="justify-content:space-between;align-items:center">
                 <span>Carbon Footprint</span>
@@ -74,7 +74,7 @@
               </div>
               <small id="kpiCarbonIntensity" class="kpi-note">Intensity: --</small>
             </article>
-            <article class="kpi"><span>Cost Burn</span><strong id="kpiCost">--</strong><small>Rs/h</small></article>
+            <article class="kpi"><span class="cost-burn-title">Cost Burn</span><strong id="kpiCost">--</strong><small class="cost-burn-unit">Rs/h</small></article>
             <article class="kpi kpi-savings">
               <span>Savings Potential</span>
               <div class="savings-layout">
@@ -91,6 +91,83 @@
               </div>
             </article>
           </div>
+          
+          <!-- Today's Usage Card -->
+          <article class="card stack">
+            <div class="row" style="justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Today's Usage</h3>
+              <div id="usageComparison" class="usage-comparison-pill"></div>
+            </div>
+            <div class="chart-frame">
+              <canvas id="chartTodayUsage"></canvas>
+            </div>
+          </article>
+
+          <!-- Tariff Schedule Card -->
+          <article class="card stack">
+            <h3 style="margin:0">Tariff Schedule — Today</h3>
+            <div class="tariff-schedule-container">
+              <div class="tariff-segments">
+                <div class="tariff-segment off-peak" data-hours="00-06">
+                  <span class="segment-label">Off-peak Rs 4.00</span>
+                </div>
+                <div class="tariff-segment peak" data-hours="06-09">
+                  <span class="segment-label">Peak Rs 8.50</span>
+                </div>
+                <div class="tariff-segment normal" data-hours="09-17">
+                  <span class="segment-label">Normal Rs 6.00</span>
+                </div>
+                <div class="tariff-segment peak" data-hours="17-22">
+                  <span class="segment-label">Peak Rs 8.50</span>
+                </div>
+                <div class="tariff-segment off-peak" data-hours="22-24">
+                  <span class="segment-label">Off-peak Rs 4.00</span>
+                </div>
+                <div class="current-time-line" id="currentTimeLine"></div>
+              </div>
+              <div id="tariffStatusText" class="tariff-status-text"></div>
+            </div>
+          </article>
+
+          <!-- Smart Recommendations Section -->
+          <section class="smart-recommendations">
+            <h3 style="margin:0 0 1rem 0">Smart Recommendations</h3>
+            <div class="recommendations-grid">
+              <article class="recommendation-card">
+                <div class="recommendation-content">
+                  <div class="recommendation-header">
+                    <span class="recommendation-icon">💡</span>
+                    <h4>Run Washing Machine after 22:00 tonight</h4>
+                  </div>
+                  <p class="recommendation-text">Off-peak Rs 4.00 vs current Rs 6.00 → Save <strong>~₹14/cycle</strong></p>
+                  <button class="btn btn-outline recommendation-btn" id="scheduleWMBtn">Schedule Now</button>
+                </div>
+              </article>
+              
+              <article class="recommendation-card">
+                <div class="recommendation-content">
+                  <div class="recommendation-header">
+                    <span class="recommendation-icon">🌡️</span>
+                    <h4>Pre-cool with AC before 17:00 (peak starts then)</h4>
+                  </div>
+                  <p class="recommendation-text">Avoid Rs 8.50/kWh peak → Save <strong>~₹22 if run 1hr earlier</strong></p>
+                  <button class="btn btn-outline recommendation-btn" id="scheduleACBtn">Schedule Now</button>
+                </div>
+              </article>
+              
+              <article class="recommendation-card">
+                <div class="recommendation-content">
+                  <div class="recommendation-header">
+                    <span class="recommendation-icon">🚿</span>
+                    <h4>Run Geyser between 00:00–06:00</h4>
+                  </div>
+                  <p class="recommendation-text">Cheapest slot of the day → Save <strong>~₹8 per use</strong></p>
+                  <button class="btn btn-outline recommendation-btn" id="scheduleGeyserBtn">Schedule Now</button>
+                </div>
+              </article>
+            </div>
+          </section>
+
           <article id="energyBalanceCard" class="card stack">
             <div class="row" style="justify-content:space-between;align-items:flex-start;gap:1rem">
               <div class="stack" style="gap:0.22rem">
@@ -126,24 +203,63 @@
         <section id="appliances" class="page">
           <div class="appliances-layout">
             <article class="card stack appliances-controls-card">
-              <h3>Appliance Controls</h3>
+              <div class="row" style="justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Appliance Controls</h3>
+                <button id="addApplianceBtn" class="btn btn-outline" type="button">+ Add Appliance</button>
+              </div>
               <div id="applianceList" class="appliance-grid"></div>
             </article>
             <div class="appliances-right-panel">
-              <article class="card schedule-compact appliances-schedule-card">
+              <article class="card stack appliances-schedule-card">
                 <h3>Schedule Automation</h3>
-                <form id="scheduleForm" class="schedule-form-row">
-                  <select id="scheduleDevice" required aria-label="Appliance"></select>
-                  <input id="scheduleTime" type="time" required aria-label="Run time" />
-                  <select id="scheduleRepeat" aria-label="Repeat">
-                    <option value="daily">Daily</option>
-                    <option value="weekdays">Weekdays</option>
-                    <option value="weekends">Weekends</option>
-                    <option value="once">Once</option>
-                  </select>
-                  <button class="btn" type="submit">Schedule</button>
-                </form>
-                <ul id="scheduleList" class="schedule-list"></ul>
+                <div class="schedule-form-container">
+                  <div class="form-row">
+                    <label for="scheduleDevice">Appliance</label>
+                    <select id="scheduleDevice" required aria-label="Appliance"></select>
+                  </div>
+                  <div class="form-row">
+                    <label>Action</label>
+                    <div class="action-toggle-group">
+                      <button type="button" class="action-btn active" data-action="ON">ON</button>
+                      <button type="button" class="action-btn" data-action="OFF">OFF</button>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <label for="scheduleTime">Time</label>
+                    <input id="scheduleTime" type="time" required aria-label="Run time" />
+                  </div>
+                  <div class="form-row">
+                    <label>Repeat</label>
+                    <div class="day-chips">
+                      <button type="button" class="day-chip" data-day="M">M</button>
+                      <button type="button" class="day-chip" data-day="T">T</button>
+                      <button type="button" class="day-chip" data-day="W">W</button>
+                      <button type="button" class="day-chip" data-day="T">T</button>
+                      <button type="button" class="day-chip" data-day="F">F</button>
+                      <button type="button" class="day-chip" data-day="S">S</button>
+                      <button type="button" class="day-chip" data-day="S">S</button>
+                    </div>
+                  </div>
+                  <button id="addScheduleBtn" class="btn" type="button">+ Add Schedule</button>
+                </div>
+                
+                <div class="active-schedules">
+                  <div style="display:flex; justify-content:space-between; 
+                    align-items:center; margin-bottom:12px;">
+                    <h4 style="margin:0">Active Schedules</h4>
+                    <button id="clearAllSchedulesBtn" style="
+                      padding: 6px 12px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      border-radius: 8px;
+                      border: 1.5px solid #fee2e2;
+                      background: #fff;
+                      color: #dc2626;
+                      cursor: pointer;
+                    ">🗑 Clear All</button>
+                  </div>
+                  <div id="scheduleList" class="schedule-list-new"></div>
+                </div>
               </article>
               <article class="card stack appliance-graph-card">
                 <h3>Appliance Energy Distribution</h3>
@@ -419,7 +535,58 @@ Support: support@intellismart.demo
         </article>
       </main>
     </section>
+  </section>
+
+  <!-- Add Appliance Modal -->
+  <div id="addApplianceModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add New Appliance</h3>
+        <button id="closeModalBtn" class="btn btn-outline" type="button">✕</button>
+      </div>
+      <form id="addApplianceForm" class="stack">
+        <div class="form-group">
+          <label for="applianceName">Appliance Name</label>
+          <input id="applianceName" type="text" required placeholder="Enter appliance name" />
+        </div>
+        <div class="form-group">
+          <label for="applianceType">Type</label>
+          <select id="applianceType" required>
+            <option value="">Select type</option>
+            <option value="AC">AC</option>
+            <option value="Washing Machine">Washing Machine</option>
+            <option value="Geyser">Geyser</option>
+            <option value="Refrigerator">Refrigerator</option>
+            <option value="Fan">Fan</option>
+            <option value="Lights">Lights</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Load Type</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="loadType" value="Flexible" required />
+              <span>Flexible</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="loadType" value="Essential" required />
+              <span>Essential</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="appliancePower">Power Rating (kWh/h)</label>
+          <input id="appliancePower" type="number" step="0.1" min="0.1" required placeholder="Enter power rating" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancelAddAppliance" class="btn btn-outline">Cancel</button>
+          <button type="submit" class="btn">Add Appliance</button>
+        </div>
+      </form>
+    </div>
   </div>
+
   <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
 
   <button id="chatToggle" class="chat-toggle" type="button" aria-label="Open support assistant">
