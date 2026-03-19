@@ -46,3 +46,42 @@ def request_detail(request_id: str, user=Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Service request not found")
     return {"status": "success", "data": req}
 
+
+@router.post("/emergency")
+def create_emergency_request(payload: ServiceRequestCreate, user=Depends(get_current_user)):
+    request_id = store.next_id("request")
+    now = datetime.now(IST).isoformat()
+    req = {
+        "request_id": request_id,
+        "user_id": user["user_id"],
+        "meter_id": user["smart_meter_id"],
+        "request_type": f"EMERGENCY: {payload.request_type}",
+        "description": payload.description,
+        "status": "OPEN",
+        "priority": "HIGH",
+        "created_at": now,
+        "updated_at": now,
+        "timeline": [{"status": "OPEN", "note": "Emergency request created — electrician will contact within 1 hour", "at": now}],
+    }
+    store.service_requests[request_id] = req
+    return {"status": "success", "data": req}
+
+
+@router.post("/discom")
+def create_discom_request(payload: ServiceRequestCreate, user=Depends(get_current_user)):
+    request_id = store.next_id("request")
+    now = datetime.now(IST).isoformat()
+    req = {
+        "request_id": request_id,
+        "user_id": user["user_id"],
+        "meter_id": user["smart_meter_id"],
+        "request_type": f"DISCOM: {payload.request_type}",
+        "description": payload.description,
+        "status": "OPEN",
+        "created_at": now,
+        "updated_at": now,
+        "timeline": [{"status": "OPEN", "note": "DISCOM request submitted", "at": now}],
+    }
+    store.service_requests[request_id] = req
+    return {"status": "success", "data": req}
+

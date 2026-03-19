@@ -14,13 +14,13 @@
 <body>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand">
+      <div class="brand" style="flex-shrink:0">
         <h2>Consumer Console</h2>
         <p>SMART METER SUPER APP</p>
         <input id="apiBase" type="text" value="" />
       </div>
-      <nav id="nav" class="nav"></nav>
-      <div class="stack">
+      <nav id="nav" class="nav" style="overflow-y:auto;flex:1;min-height:0"></nav>
+      <div class="stack" style="margin-top:auto;padding-top:8px">
         <div id="whoami" class="badge normal">Loading profile...</div>
         <button id="logoutBtn" class="btn btn-outline" type="button">Logout</button>
       </div>
@@ -527,6 +527,167 @@ Support: support@intellismart.demo
             </div>
             <p id="settingsStatus" class="result"></p>
           </article>
+        </section>
+
+        <!-- Energy Wallet Page -->
+        <section id="wallet" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>Energy Wallet</h3>
+              <div class="kpi-grid">
+                <article class="kpi"><span>Wallet Balance</span><strong id="walletBalance">--</strong><small>Points</small></article>
+                <article class="kpi"><span>Total Earned</span><strong id="walletEarned">--</strong><small>Points</small></article>
+                <article class="kpi"><span>Total Redeemed</span><strong id="walletRedeemed">--</strong><small>Points</small></article>
+                <article class="kpi"><span>Cash Value</span><strong id="walletCash">--</strong><small>Rs</small></article>
+              </div>
+              <div id="walletTiers" class="stack"></div>
+            </article>
+            <article class="card stack">
+              <h3>Earn & Redeem</h3>
+              <div id="walletOffers" class="stack"></div>
+              <div style="margin-top:1rem">
+                <h4 style="margin-bottom:0.5rem">Redeem Points</h4>
+                <form id="redeemForm" class="form-grid">
+                  <input id="redeemPoints" type="number" min="100" step="100" placeholder="Points to redeem" />
+                  <button class="btn" type="submit">Redeem</button>
+                </form>
+                <p id="redeemMsg" class="result"></p>
+              </div>
+            </article>
+          </div>
+          <article class="card stack">
+            <h3>Transaction History</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Date</th><th>Action</th><th>Points</th><th>Reason</th></tr></thead>
+                <tbody id="walletHistory"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- Marketplace Page -->
+        <section id="marketplace" class="page">
+          <div class="stack" style="margin-bottom:1rem">
+            <h3 style="margin:0">Energy Appliance Marketplace</h3>
+            <p style="color:var(--muted);font-size:14px">Smart recommendations based on your usage data</p>
+          </div>
+          <div id="marketplaceRecommendation" class="card stack" style="border-left:4px solid var(--brand);margin-bottom:1rem"></div>
+          <div class="panel-grid" id="marketplaceGrid"></div>
+        </section>
+
+        <!-- Outage & Emergency Page -->
+        <section id="outage" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <div class="row" style="justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Live Outage Map</h3>
+                <span id="outageStatusBadge" class="badge off-peak">Grid: Normal</span>
+              </div>
+              <div id="outageMap" style="height:280px;background:var(--surface-muted);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+                <div id="outageMapContent"></div>
+              </div>
+              <div id="outageList" class="stack"></div>
+            </article>
+            <article class="card stack">
+              <h3>🚨 Emergency Electrician</h3>
+              <p style="color:var(--muted);font-size:13px">Book a certified electrician for urgent repairs, faults, or safety issues.</p>
+              <form id="emergencyForm" class="stack">
+                <select id="emergencyType">
+                  <option value="electrical_fault">Electrical Fault / Short Circuit</option>
+                  <option value="power_outage">Power Outage at Home</option>
+                  <option value="meter_issue">Meter Issue</option>
+                  <option value="wiring_repair">Wiring Repair</option>
+                  <option value="appliance_installation">Appliance Installation</option>
+                  <option value="safety_inspection">Safety Inspection</option>
+                </select>
+                <input id="emergencyAddress" required placeholder="Your address" />
+                <textarea id="emergencyDesc" required placeholder="Describe the emergency" rows="3"></textarea>
+                <select id="emergencyUrgency">
+                  <option value="emergency">🔴 Emergency (within 1 hour)</option>
+                  <option value="urgent">🟡 Urgent (within 4 hours)</option>
+                  <option value="scheduled">🟢 Scheduled (next day)</option>
+                </select>
+                <button class="btn" type="submit" style="background:linear-gradient(135deg,#dc2626,#ef4444)">🚨 Book Electrician Now</button>
+              </form>
+              <p id="emergencyMsg" class="result"></p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Solar & EV Page -->
+        <section id="greenenergy" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>☀️ Solar ROI Calculator</h3>
+              <form id="solarRoiForm" class="stack">
+                <div class="form-grid">
+                  <input id="solarCapacity" type="number" min="1" step="0.5" placeholder="System capacity (kW)" />
+                  <input id="solarCost" type="number" min="10000" step="1000" placeholder="Installation cost (Rs)" />
+                </div>
+                <button class="btn" type="submit">Calculate ROI</button>
+              </form>
+              <div id="solarRoiResult" class="result"></div>
+            </article>
+            <article class="card stack">
+              <h3>🔋 EV Charging Cost Calculator</h3>
+              <form id="evCalcForm" class="stack">
+                <div class="form-grid">
+                  <input id="evBatterySize" type="number" min="10" step="5" placeholder="Battery size (kWh)" />
+                  <input id="evChargePercent" type="number" min="1" max="100" placeholder="Charge % needed" />
+                </div>
+                <button class="btn" type="submit">Calculate Cost</button>
+              </form>
+              <div id="evCalcResult" class="result"></div>
+            </article>
+          </div>
+          <article class="card stack">
+            <h3>⚡ Nearby EV Charging Stations</h3>
+            <div id="evStations" class="panel-grid"></div>
+          </article>
+          <article class="card stack">
+            <h3>🏪 Solar Vendor Comparison</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Vendor</th><th>Price/kW</th><th>Warranty</th><th>Rating</th><th>Action</th></tr></thead>
+                <tbody id="solarVendors"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- DISCOM Self-Service Page -->
+        <section id="discom" class="page">
+          <div class="panel-grid">
+            <article class="card stack">
+              <h3>New Connection / Load Enhancement</h3>
+              <form id="discomForm" class="stack">
+                <select id="discomRequestType">
+                  <option value="new_connection">New Electricity Connection</option>
+                  <option value="load_enhancement">Load Enhancement</option>
+                  <option value="temporary_disconnection">Temporary Disconnection</option>
+                  <option value="name_transfer">Name Transfer</option>
+                  <option value="voltage_fluctuation">Voltage Fluctuation Complaint</option>
+                  <option value="transformer_fault">Transformer Fault</option>
+                </select>
+                <input id="discomName" required placeholder="Full Name" />
+                <input id="discomAddress" required placeholder="Property Address" />
+                <input id="discomPhone" required placeholder="Contact Number" />
+                <textarea id="discomDetails" required placeholder="Additional details" rows="3"></textarea>
+                <button class="btn" type="submit">Submit Request</button>
+              </form>
+              <p id="discomMsg" class="result"></p>
+            </article>
+            <article class="card stack">
+              <h3>My DISCOM Requests</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Request ID</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                  <tbody id="discomHistory"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
         </section>
 
         <article class="card stack">

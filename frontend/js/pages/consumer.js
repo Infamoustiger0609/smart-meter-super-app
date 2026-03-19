@@ -42,6 +42,11 @@ const pages = [
   ["service", "Service Requests", "build"],
   ["solar", "Solar Dashboard", "solar_power"],
   ["calculator", "Energy Calculator", "calculate"],
+  ["wallet", "Energy Wallet", "account_balance_wallet"],
+  ["marketplace", "Marketplace", "store"],
+  ["outage", "Outage & Emergency", "warning"],
+  ["greenenergy", "Solar & EV", "electric_bolt"],
+  ["discom", "DISCOM Services", "business"],
   ["help", "Help Center", "help"],
   ["settings", "Settings", "settings"],
 ];
@@ -1536,6 +1541,11 @@ async function refreshPage(pageId) {
     calculator: async () => {},
     help: loadHelp,
     settings: async () => {},
+    wallet: loadWallet,
+    marketplace: loadMarketplace,
+    outage: loadOutage,
+    greenenergy: loadGreenEnergy,
+    discom: loadDiscom,
   };
 
   if (handlers[page]) await handlers[page]();
@@ -2133,6 +2143,344 @@ async function refreshVisibleCharts() {
   if (active === "appliances") await loadAppliances();
   if (active === "analytics") await loadAnalytics();
   if (active === "solar") await loadSolar();
+}
+
+async function loadWallet() {
+  const points = Math.floor(Math.random() * 2000) + 500;
+  const earned = points + Math.floor(Math.random() * 500);
+  const redeemed = earned - points;
+  
+  if (document.getElementById('walletBalance')) {
+    document.getElementById('walletBalance').textContent = points;
+    document.getElementById('walletEarned').textContent = earned;
+    document.getElementById('walletRedeemed').textContent = redeemed;
+    document.getElementById('walletCash').textContent = (points * 0.1).toFixed(0);
+  }
+
+  const tiers = [
+    { name: 'Bronze', min: 0, max: 999, color: '#cd7f32' },
+    { name: 'Silver', min: 1000, max: 2499, color: '#9e9e9e' },
+    { name: 'Gold', min: 2500, max: 4999, color: '#ffc107' },
+    { name: 'Platinum', min: 5000, max: 99999, color: '#00bcd4' },
+  ];
+  const currentTier = tiers.find(t => points >= t.min && points <= t.max) || tiers[0];
+  const tiersEl = document.getElementById('walletTiers');
+  if (tiersEl) {
+    tiersEl.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${tiers.map(t => `
+          <div style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:2px solid ${t.name === currentTier.name ? t.color : 'var(--line)'};text-align:center;background:${t.name === currentTier.name ? t.color + '22' : 'var(--surface-muted)'}">
+            <div style="font-weight:700;color:${t.color}">${t.name}</div>
+            <div style="font-size:11px;color:var(--muted)">${t.min}–${t.max === 99999 ? '∞' : t.max} pts</div>
+            ${t.name === currentTier.name ? '<div style="font-size:11px;font-weight:600;color:var(--ok)">✓ Current</div>' : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  const offersEl = document.getElementById('walletOffers');
+  if (offersEl) {
+    const offers = [
+      { icon: '⚡', title: 'Shift load to off-peak', desc: 'Earn 50 pts per off-peak hour scheduled', action: 'Earn Now' },
+      { icon: '🌱', title: 'Reduce consumption 10%', desc: 'Earn 200 pts this month', action: 'Track Progress' },
+      { icon: '💰', title: 'Pay bill on time', desc: 'Earn 100 pts per on-time payment', action: 'Pay Bill' },
+      { icon: '☀️', title: 'Solar generation bonus', desc: 'Earn 5 pts per kWh exported to grid', action: 'View Solar' },
+    ];
+    offersEl.innerHTML = offers.map(o => `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface-muted);border-radius:10px">
+        <span style="font-size:24px">${o.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${o.title}</div>
+          <div style="font-size:12px;color:var(--muted)">${o.desc}</div>
+        </div>
+        <button class="btn btn-outline" style="font-size:12px;padding:6px 12px">${o.action}</button>
+      </div>
+    `).join('');
+  }
+
+  const historyEl = document.getElementById('walletHistory');
+  if (historyEl) {
+    const txns = [
+      { date: '2026-03-18', action: 'Earned', points: '+50', reason: 'Off-peak scheduling' },
+      { date: '2026-03-15', action: 'Earned', points: '+100', reason: 'On-time bill payment' },
+      { date: '2026-03-10', action: 'Redeemed', points: '-200', reason: 'Bill discount' },
+      { date: '2026-03-05', action: 'Earned', points: '+200', reason: 'Monthly reduction goal' },
+    ];
+    historyEl.innerHTML = txns.map(t => `
+      <tr>
+        <td>${t.date}</td>
+        <td>${t.action}</td>
+        <td style="color:${t.points.startsWith('+') ? 'var(--ok)' : 'var(--danger)'};font-weight:600">${t.points}</td>
+        <td>${t.reason}</td>
+      </tr>
+    `).join('');
+  }
+
+  const redeemForm = document.getElementById('redeemForm');
+  if (redeemForm && !redeemForm.dataset.bound) {
+    redeemForm.dataset.bound = 'true';
+    redeemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pts = parseInt(document.getElementById('redeemPoints').value);
+      document.getElementById('redeemMsg').textContent = `✅ ${pts} points redeemed! Rs ${(pts * 0.1).toFixed(0)} credited to your bill.`;
+    });
+  }
+}
+
+async function loadMarketplace() {
+  const recEl = document.getElementById('marketplaceRecommendation');
+  if (recEl) {
+    recEl.innerHTML = `
+      <div class="row" style="gap:12px;align-items:flex-start">
+        <span style="font-size:32px">🎯</span>
+        <div>
+          <h4 style="margin:0 0 4px">Based on your usage: Your AC runs 6+ hrs/day at peak tariff</h4>
+          <p style="margin:0;color:var(--muted);font-size:13px">Upgrading to a 5-star inverter AC could save you <strong style="color:var(--ok)">₹4,200/year</strong> in electricity costs</p>
+        </div>
+      </div>
+    `;
+  }
+
+  const products = [
+    { icon: '❄️', name: 'Daikin 1.5T 5-Star Inverter AC', rating: '5★', price: '₹42,990', savings: 'Save ₹4,200/yr', tag: 'Top Pick', link: 'https://www.flipkart.com' },
+    { icon: '🌀', name: 'Voltas 1.5T 4-Star Split AC', rating: '4★', price: '₹34,490', savings: 'Save ₹2,800/yr', tag: 'Budget Pick', link: 'https://www.amazon.in' },
+    { icon: '👕', name: 'LG 7kg 5-Star Washing Machine', rating: '5★', price: '₹28,990', savings: 'Save ₹1,200/yr', tag: 'Recommended', link: 'https://www.flipkart.com' },
+    { icon: '🚿', name: 'Racold 25L Solar Water Heater', rating: '5★', price: '₹18,500', savings: 'Save ₹3,600/yr', tag: 'Green Choice', link: 'https://www.amazon.in' },
+    { icon: '☀️', name: 'Loom Solar 3kW Rooftop Kit', rating: '5★', price: '₹1,20,000', savings: 'Save ₹18,000/yr', tag: 'Solar', link: 'https://www.loomsolar.com' },
+    { icon: '🔋', name: 'Luminous 150Ah Inverter Battery', rating: '4★', price: '₹12,800', savings: 'Backup: 8 hrs', tag: 'Backup Power', link: 'https://www.amazon.in' },
+  ];
+
+  const gridEl = document.getElementById('marketplaceGrid');
+  if (gridEl) {
+    gridEl.innerHTML = products.map(p => `
+      <article class="card" style="padding:16px;position:relative">
+        <div style="position:absolute;top:12px;right:12px;background:var(--brand);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${p.tag}</div>
+        <div style="font-size:36px;margin-bottom:8px">${p.icon}</div>
+        <h4 style="margin:0 0 4px;font-size:14px">${p.name}</h4>
+        <div style="font-size:13px;color:var(--muted)">${p.rating}</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin:8px 0">${p.price}</div>
+        <div style="font-size:12px;color:var(--ok);font-weight:600;margin-bottom:12px">${p.savings}</div>
+        <a href="${p.link}" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;font-size:13px">View Product →</a>
+      </article>
+    `).join('');
+  }
+}
+
+async function loadOutage() {
+  const outages = [
+    { zone: 'Sector 62, Noida', status: 'ACTIVE', since: '14:30', eta: '17:00', type: 'Planned Maintenance' },
+    { zone: 'Sector 18, Noida', status: 'RESOLVED', since: '10:00', eta: 'Restored at 12:30', type: 'Transformer Fault' },
+    { zone: 'Greater Noida West', status: 'ACTIVE', since: '15:45', eta: '18:00', type: 'Cable Fault' },
+  ];
+
+  const mapEl = document.getElementById('outageMapContent');
+  if (mapEl) {
+    mapEl.innerHTML = `
+      <div style="text-align:center;padding:20px">
+        <div style="font-size:48px;margin-bottom:8px">🗺️</div>
+        <div style="font-weight:600;margin-bottom:4px">Delhi NCR Grid Map</div>
+        <div style="font-size:12px;color:var(--muted)">${outages.filter(o => o.status === 'ACTIVE').length} active outage(s) in your region</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+          ${outages.map(o => `
+            <div style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;background:${o.status === 'ACTIVE' ? '#fee2e2' : '#d1fae5'};color:${o.status === 'ACTIVE' ? '#991b1b' : '#065f46'}">
+              ${o.zone}: ${o.status}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const badgeEl = document.getElementById('outageStatusBadge');
+  const hasActive = outages.some(o => o.status === 'ACTIVE');
+  if (badgeEl) {
+    badgeEl.className = `badge ${hasActive ? 'peak' : 'off-peak'}`;
+    badgeEl.textContent = hasActive ? `Grid: ${outages.filter(o => o.status === 'ACTIVE').length} Active Outage(s)` : 'Grid: Normal';
+  }
+
+  const listEl = document.getElementById('outageList');
+  if (listEl) {
+    listEl.innerHTML = outages.map(o => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface-muted);border-radius:10px;border-left:4px solid ${o.status === 'ACTIVE' ? 'var(--danger)' : 'var(--ok)'}">
+        <div>
+          <div style="font-weight:600;font-size:14px">${o.zone}</div>
+          <div style="font-size:12px;color:var(--muted)">${o.type} · Since ${o.since}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge ${o.status === 'ACTIVE' ? 'peak' : 'off-peak'}">${o.status}</span>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">ETA: ${o.eta}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const emergencyForm = document.getElementById('emergencyForm');
+  if (emergencyForm && !emergencyForm.dataset.bound) {
+    emergencyForm.dataset.bound = 'true';
+    emergencyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = document.getElementById('emergencyType').value;
+      const desc = document.getElementById('emergencyDesc').value;
+      const address = document.getElementById('emergencyAddress').value;
+      const urgency = document.getElementById('emergencyUrgency').value;
+      const msgEl = document.getElementById('emergencyMsg');
+      try {
+        await api('/service/emergency', {
+          method: 'POST',
+          body: JSON.stringify({
+            request_type: type,
+            description: `${desc} | Address: ${address} | Urgency: ${urgency}`
+          })
+        }, state.token);
+        if (msgEl) msgEl.textContent = '✅ Electrician booked! You will receive a call within 30 minutes.';
+        emergencyForm.reset();
+        logEvent(`Emergency electrician booked: ${type}`);
+      } catch(err) {
+        if (msgEl) msgEl.textContent = '❌ Booking failed. Please try again.';
+      }
+    });
+  }
+}
+
+async function loadGreenEnergy() {
+  const vendors = [
+    { name: 'Tata Power Solar', price: '₹38,000/kW', warranty: '25 years', rating: '4.8★' },
+    { name: 'Adani Solar', price: '₹35,000/kW', warranty: '25 years', rating: '4.6★' },
+    { name: 'Loom Solar', price: '₹32,000/kW', warranty: '10 years', rating: '4.4★' },
+  ];
+
+  const vendorsEl = document.getElementById('solarVendors');
+  if (vendorsEl) {
+    vendorsEl.innerHTML = vendors.map(v => `
+      <tr>
+        <td><strong>${v.name}</strong></td>
+        <td>${v.price}</td>
+        <td>${v.warranty}</td>
+        <td>${v.rating}</td>
+        <td><button class="btn btn-outline" style="font-size:12px;padding:6px 12px" onclick="logEvent('Vendor enquiry: ${v.name}')">Get Quote</button></td>
+      </tr>
+    `).join('');
+  }
+
+  const evStations = [
+    { name: 'Tata Power EV Hub', location: 'Sector 18, Noida', slots: 3, price: '₹15/kWh', status: 'Available' },
+    { name: 'Ather Grid', location: 'Sector 62, Noida', slots: 1, price: '₹12/kWh', status: 'Busy' },
+    { name: 'BPCL Charge Zone', location: 'NH-24, Delhi', slots: 5, price: '₹18/kWh', status: 'Available' },
+    { name: 'ChargePoint India', location: 'Connaught Place, Delhi', slots: 2, price: '₹14/kWh', status: 'Available' },
+  ];
+
+  const stationsEl = document.getElementById('evStations');
+  if (stationsEl) {
+    stationsEl.innerHTML = evStations.map(s => `
+      <article class="card" style="padding:16px">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px">
+          <strong style="font-size:14px">⚡ ${s.name}</strong>
+          <span class="badge ${s.status === 'Available' ? 'off-peak' : 'peak'}">${s.status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">📍 ${s.location}</div>
+        <div style="font-size:12px;margin-bottom:8px">${s.slots} slots · ${s.price}</div>
+        <button class="btn btn-outline" style="font-size:12px;padding:6px 12px;width:100%" ${s.status === 'Busy' ? 'disabled' : ''}>
+          ${s.status === 'Available' ? 'Book Slot' : 'Join Waitlist'}
+        </button>
+      </article>
+    `).join('');
+  }
+
+  const solarRoiForm = document.getElementById('solarRoiForm');
+  if (solarRoiForm && !solarRoiForm.dataset.bound) {
+    solarRoiForm.dataset.bound = 'true';
+    solarRoiForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const capacity = parseFloat(document.getElementById('solarCapacity').value);
+      const cost = parseFloat(document.getElementById('solarCost').value);
+      const annualGeneration = capacity * 4.5 * 365;
+      const annualSavings = annualGeneration * 6.0;
+      const paybackYears = (cost / annualSavings).toFixed(1);
+      const roi25yr = ((annualSavings * 25 - cost) / cost * 100).toFixed(0);
+      document.getElementById('solarRoiResult').textContent = [
+        `Annual Generation: ${annualGeneration.toFixed(0)} kWh`,
+        `Annual Savings: Rs ${annualSavings.toFixed(0)}`,
+        `Payback Period: ${paybackYears} years`,
+        `25-Year ROI: ${roi25yr}%`,
+        `Government Subsidy (30%): Rs ${(cost * 0.3).toFixed(0)}`,
+        `Net Cost After Subsidy: Rs ${(cost * 0.7).toFixed(0)}`,
+        `Revised Payback: ${(cost * 0.7 / annualSavings).toFixed(1)} years`,
+      ].join('\n');
+    });
+  }
+
+  const evCalcForm = document.getElementById('evCalcForm');
+  if (evCalcForm && !evCalcForm.dataset.bound) {
+    evCalcForm.dataset.bound = 'true';
+    evCalcForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const battery = parseFloat(document.getElementById('evBatterySize').value);
+      const percent = parseFloat(document.getElementById('evChargePercent').value);
+      const kwhNeeded = battery * (percent / 100);
+      const peakCost = (kwhNeeded * 7.20).toFixed(2);
+      const offpeakCost = (kwhNeeded * 4.80).toFixed(2);
+      const normalCost = (kwhNeeded * 6.00).toFixed(2);
+      const saving = (kwhNeeded * (7.20 - 4.80)).toFixed(2);
+      document.getElementById('evCalcResult').textContent = [
+        `Energy needed: ${kwhNeeded.toFixed(2)} kWh`,
+        `Peak tariff cost (14:00-17:00, 22:00-01:00): Rs ${peakCost}`,
+        `Normal tariff cost: Rs ${normalCost}`,
+        `Off-peak cost (04:00-10:00): Rs ${offpeakCost}`,
+        `Savings by charging off-peak: Rs ${saving}`,
+        `Best time to charge: 04:00 - 09:00`,
+      ].join('\n');
+    });
+  }
+}
+
+async function loadDiscom() {
+  const discomForm = document.getElementById('discomForm');
+  if (discomForm && !discomForm.dataset.bound) {
+    discomForm.dataset.bound = 'true';
+    discomForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = document.getElementById('discomRequestType').value;
+      const name = document.getElementById('discomName').value;
+      const address = document.getElementById('discomAddress').value;
+      const phone = document.getElementById('discomPhone').value;
+      const details = document.getElementById('discomDetails').value;
+      const msgEl = document.getElementById('discomMsg');
+      try {
+        const res = await api('/service/discom', {
+          method: 'POST',
+          body: JSON.stringify({
+            request_type: type,
+            description: `Name: ${name} | Address: ${address} | Phone: ${phone} | Details: ${details}`
+          })
+        }, state.token);
+        if (msgEl) msgEl.textContent = `✅ Request submitted! ID: ${res.data.request_id}`;
+        discomForm.reset();
+        loadDiscom();
+        logEvent(`DISCOM request submitted: ${type}`);
+      } catch(err) {
+        if (msgEl) msgEl.textContent = '❌ Submission failed. Please try again.';
+      }
+    });
+  }
+
+  try {
+    const history = await api('/service/history', {}, state.token);
+    const discomReqs = (history.data || []).filter(r => r.request_type.startsWith('DISCOM:'));
+    const historyEl = document.getElementById('discomHistory');
+    if (historyEl) {
+      historyEl.innerHTML = discomReqs.length === 0
+        ? '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No DISCOM requests yet</td></tr>'
+        : discomReqs.map(r => `
+            <tr>
+              <td>${r.request_id}</td>
+              <td>${r.request_type.replace('DISCOM: ', '')}</td>
+              <td><span class="badge normal">${r.status}</span></td>
+              <td>${new Date(r.created_at).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+    }
+  } catch(err) {}
 }
 
 async function init() {

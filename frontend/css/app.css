@@ -50,6 +50,10 @@
   display: grid;
   gap: 0.35rem;
   align-content: start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
 .nav button {
@@ -1719,13 +1723,9 @@ body.sidebar-open {
 }
 
 .sidebar {
-  width: var(--sidebar-width);
-  flex: 0 0 var(--sidebar-width);
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: sticky;
-  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .content {
