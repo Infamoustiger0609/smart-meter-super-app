@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IntelliSmart" />
+  <meta name="theme-color" content="#1f6fff" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png" />
   <title>Consumer App | SMART METER SUPER APP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -764,6 +771,7 @@ Support: support@intellismart.demo
           <h3>Activity Log</h3>
           <ul id="events" class="list"></ul>
         </article>
+        <div style="height:20px"></div>
       </main>
     </section>
   </section>
@@ -819,6 +827,8 @@ Support: support@intellismart.demo
   </div>
 
   <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+  <!-- Mobile Bottom Navigation -->
+  <nav class="bottom-nav" id="bottomNav"></nav>
 
   <button id="chatToggle" class="chat-toggle" type="button" aria-label="Open support assistant">
     <span class="chat-toggle-icon">AI</span>
@@ -845,6 +855,15 @@ Support: support@intellismart.demo
   </section>
 
   <script type="module" src="/static/js/pages/consumer.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(r => console.log('SW registered'))
+          .catch(e => console.log('SW failed:', e));
+      });
+    }
+  </script>
 </body>
 </html>
 

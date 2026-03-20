@@ -1,4 +1,4 @@
-@import url("./tokens.css");
+﻿@import url("./tokens.css");
 
 .shell {
   min-height: 100vh;
@@ -1599,12 +1599,12 @@ body {
   }
 
   #refreshBtn::before {
-    content: "↻";
+    content: "â†»";
     font-size: 1rem;
   }
 
   #settingsBtn::before {
-    content: "⚙";
+    content: "âš™";
     font-size: 1rem;
   }
 
@@ -1817,3 +1817,221 @@ svg {
     overflow-x: hidden;
   }
 }
+/* ---------------------------------------
+   PWA MOBILE — Bottom Tab Bar & Polish
+   --------------------------------------- */
+
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+
+  /* Hide desktop sidebar on mobile */
+  .sidebar {
+    display: none !important;
+  }
+
+  /* Hide desktop topbar actions on mobile */
+  .topbar-actions {
+    display: none !important;
+  }
+
+  /* Hide sidebar toggle — not needed with bottom nav */
+  .sidebar-toggle {
+    display: none !important;
+  }
+
+  /* Shell takes full height */
+  .shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Content fills remaining space above bottom nav */
+  .content {
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Slimmer topbar on mobile */
+  .topbar {
+    padding: 10px 16px !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+  }
+
+  .topbar-primary {
+    flex: 1 !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+
+  #pageTitle {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    flex: 1 !important;
+  }
+
+  /* Main content scrollable, space for bottom nav */
+  .main {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 12px !important;
+    padding-bottom: 100px !important;
+    gap: 12px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-padding-bottom: 100px !important;
+  }
+
+  /* KPI cards — 2 per row */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .kpi {
+    padding: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .kpi span { font-size: 11px !important; }
+  .kpi strong { font-size: 1.3rem !important; }
+
+  /* Single column panels */
+  .panel-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Cards */
+  .card {
+    border-radius: 16px !important;
+    padding: 14px !important;
+  }
+
+  /* Recommendations single column */
+  .recommendations-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Appliance grid single column */
+  .appliance-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Forms full width */
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Charts smaller */
+  .chart-frame {
+    height: 200px !important;
+    min-height: 200px !important;
+    max-height: 200px !important;
+  }
+
+  /* Chat widget above bottom nav */
+  .chat-toggle {
+    bottom: 76px !important;
+    right: 16px !important;
+  }
+
+  .chat-widget {
+    bottom: 64px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: 75vh !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .chat-toggle-label {
+    display: none !important;
+  }
+
+  /* -- Bottom Navigation Bar -- */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 64px !important;
+    background: var(--surface-card) !important;
+    border-top: 1px solid var(--line) !important;
+    z-index: 1000 !important;
+    padding: 0 4px !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08) !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+  }
+
+  .bottom-nav-btn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    flex: 1 !important;
+    height: 100% !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    padding: 6px 4px !important;
+    color: var(--muted) !important;
+    position: relative !important;
+  }
+
+  .bottom-nav-btn.active {
+    color: var(--brand) !important;
+  }
+
+  .bottom-nav-btn .nav-ico {
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+
+  .bottom-nav-btn .nav-label {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 56px !important;
+    text-align: center !important;
+  }
+
+  .bottom-nav-btn.active .nav-ico {
+    transform: translateY(-1px);
+  }
+}
+
+/* Desktop — bottom nav never shows */
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}
+

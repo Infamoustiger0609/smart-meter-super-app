@@ -161,6 +161,16 @@ async def serve_frontend():
     return {"status": "Backend running successfully"}
 
 
+@app.get("/manifest.json")
+def manifest():
+    return FileResponse("frontend/manifest.json", media_type="application/manifest+json")
+
+
+@app.get("/sw.js")
+def service_worker():
+    return FileResponse("frontend/sw.js", media_type="application/javascript")
+
+
 @app.get("/meter/live")
 def live_meter():
     return get_live_meter_reading()

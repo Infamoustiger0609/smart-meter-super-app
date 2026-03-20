@@ -940,6 +940,141 @@ function buildNav() {
   });
 }
 
+function buildBottomNav() {
+  const bottomNav = document.getElementById('bottomNav');
+  if (!bottomNav) return;
+
+  const mobileTabs = [
+    ["overview", "Home", "bolt"],
+    ["appliances", "Appliances", "power"],
+    ["billing", "Billing", "receipt_long"],
+    ["outage", "Emergency", "warning"],
+    ["settings", "Settings", "settings"],
+  ];
+
+  bottomNav.innerHTML = mobileTabs.map(([id, label, icon]) => `
+    <button class="bottom-nav-btn" data-page="${id}" type="button">
+      <span class="nav-ico material-icons">${icon}</span>
+      <span class="nav-label">${label}</span>
+    </button>
+  `).join('') + `
+    <button class="bottom-nav-btn" id="moreMenuBtn" type="button">
+      <span class="nav-ico material-icons">apps</span>
+      <span class="nav-label">More</span>
+    </button>
+  `;
+
+  bottomNav.querySelectorAll('.bottom-nav-btn[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchPage(btn.dataset.page);
+      updateBottomNav(btn.dataset.page);
+      closeMoreMenu();
+    });
+  });
+
+  document.getElementById('moreMenuBtn')?.addEventListener('click', toggleMoreMenu);
+
+  // Build more menu overlay
+  if (!document.getElementById('moreMenuOverlay')) {
+    const overlay = document.createElement('div');
+    overlay.id = 'moreMenuOverlay';
+    overlay.style.cssText = `
+      display:none;
+      position:fixed;
+      bottom:64px;
+      left:0;
+      right:0;
+      background:var(--surface-card);
+      border-top:1px solid var(--line);
+      border-radius:20px 20px 0 0;
+      z-index:999;
+      padding:16px;
+      box-shadow:0 -8px 32px rgba(0,0,0,0.15);
+      max-height:70vh;
+      overflow-y:auto;
+    `;
+
+    const allPages = [
+      ["payments", "Payments", "payments"],
+      ["analytics", "Analytics", "insights"],
+      ["service", "Service Requests", "build"],
+      ["solar", "Solar Dashboard", "solar_power"],
+      ["calculator", "Calculator", "calculate"],
+      ["wallet", "Energy Wallet", "account_balance_wallet"],
+      ["marketplace", "Marketplace", "store"],
+      ["greenenergy", "Solar & EV", "electric_bolt"],
+      ["discom", "DISCOM Services", "business"],
+      ["powerbackup", "Power Backup", "battery_charging_full"],
+      ["help", "Help Center", "help"],
+    ];
+
+    overlay.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <strong style="font-size:16px">All Pages</strong>
+        <button id="closeMoreBtn" style="border:none;background:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:4px 8px">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="moreMenuGrid">
+        ${allPages.map(([id, label, icon]) => `
+          <button data-page="${id}"
+            style="display:flex;flex-direction:column;align-items:center;gap:6px;
+            padding:14px 8px;border-radius:14px;border:1px solid var(--line);
+            background:var(--surface-muted);cursor:pointer;color:var(--text)">
+            <span class="material-icons" style="font-size:24px;color:var(--brand)">${icon}</span>
+            <span style="font-size:11px;font-weight:600;text-align:center;line-height:1.3">${label}</span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Wire close button
+    document.getElementById('closeMoreBtn')?.addEventListener('click', closeMoreMenu);
+
+    // Wire all page buttons using event delegation
+    document.getElementById('moreMenuGrid')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-page]');
+      if (!btn) return;
+      const pageId = btn.dataset.page;
+      switchPage(pageId);
+      updateBottomNav(pageId);
+      closeMoreMenu();
+    });
+
+    // Close when tapping outside
+    document.addEventListener('click', (e) => {
+      const overlay = document.getElementById('moreMenuOverlay');
+      const moreBtn = document.getElementById('moreMenuBtn');
+      if (overlay && overlay.style.display !== 'none' &&
+          !overlay.contains(e.target) && !moreBtn?.contains(e.target)) {
+        closeMoreMenu();
+      }
+    });
+  }
+}
+
+function toggleMoreMenu() {
+  const overlay = document.getElementById('moreMenuOverlay');
+  if (!overlay) return;
+  const isOpen = overlay.style.display !== 'none';
+  overlay.style.display = isOpen ? 'none' : 'block';
+  const moreBtn = document.getElementById('moreMenuBtn');
+  if (moreBtn) moreBtn.classList.toggle('active', !isOpen);
+}
+
+function closeMoreMenu() {
+  const overlay = document.getElementById('moreMenuOverlay');
+  if (overlay) overlay.style.display = 'none';
+  const moreBtn = document.getElementById('moreMenuBtn');
+  if (moreBtn) moreBtn.classList.remove('active');
+}
+
+function updateBottomNav(activeId) {
+  document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === activeId);
+  });
+}
+
 function scheduleKey(deviceId, runTime, idx) {
   return `${deviceId}|${runTime}|${idx}`;
 }
@@ -964,6 +1099,7 @@ function switchPage(id) {
   const selected = pages.find((p) => p[0] === id);
   if (selected) el.pageTitle.textContent = selected[1];
   refreshPage(id).catch((err) => logEvent(err.message, true));
+  updateBottomNav(id);
 }
 
 function setBillingEstimate(data) {
@@ -2695,6 +2831,7 @@ async function init() {
   loadScheduleMeta();
   await initDefaultSchedules(); // Initialize default schedules
   buildNav();
+  buildBottomNav();
   
   // Render UI first
   el.whoami.textContent = `${state.user?.full_name || "Consumer"} (${state.role})`;
