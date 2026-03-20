@@ -690,6 +690,76 @@ Support: support@intellismart.demo
           </div>
         </section>
 
+        <!-- Power Backup Page -->
+        <section id="powerbackup" class="page">
+          <div class="stack" style="margin-bottom:1rem">
+            <h3 style="margin:0">⚡ Power Backup Solutions</h3>
+            <p style="color:var(--muted);font-size:14px">Rent generators or batteries for emergencies and power cuts</p>
+          </div>
+
+          <!-- Rental Options -->
+          <div class="panel-grid" id="backupProductsGrid"></div>
+
+          <!-- Order Form -->
+          <div class="panel-grid" style="margin-top:1rem">
+            <article class="card stack">
+              <h3>📦 Place Rental Order</h3>
+              <p style="color:var(--muted);font-size:13px">Same-day delivery available in Delhi NCR for emergency orders.</p>
+              <form id="backupOrderForm" class="stack">
+                <select id="backupProductType">
+                  <option value="generator_2kw">Generator — 2 kW (₹800/day)</option>
+                  <option value="generator_5kw">Generator — 5 kW (₹1,500/day)</option>
+                  <option value="generator_10kw">Generator — 10 kW (₹2,800/day)</option>
+                  <option value="battery_2kwh">Portable Battery — 2 kWh (₹500/day)</option>
+                  <option value="battery_5kwh">Portable Battery — 5 kWh (₹900/day)</option>
+                  <option value="inverter_battery">Inverter + Battery Kit (₹600/day)</option>
+                  <option value="solar_generator">Solar Generator — 1 kW (₹700/day)</option>
+                </select>
+                <div class="form-grid">
+                  <input id="backupStartDate" type="date" required placeholder="Start Date" />
+                  <input id="backupDays" type="number" min="1" max="30" placeholder="Number of days" required />
+                </div>
+                <input id="backupAddress" required placeholder="Delivery address" />
+                <input id="backupPhone" required placeholder="Contact number" />
+                <select id="backupUrgency">
+                  <option value="emergency">🔴 Emergency — Within 2 hours</option>
+                  <option value="same_day">🟡 Same Day — Within 6 hours</option>
+                  <option value="next_day">🟢 Next Day — Scheduled delivery</option>
+                </select>
+                <textarea id="backupNotes" placeholder="Additional notes (optional)" rows="2"></textarea>
+                <button class="btn" type="submit">🛒 Confirm Rental Order</button>
+              </form>
+              <p id="backupOrderMsg" class="result"></p>
+            </article>
+
+            <article class="card stack">
+              <h3>📋 My Rental Orders</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Product</th>
+                      <th>Days</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Delivery</th>
+                    </tr>
+                  </thead>
+                  <tbody id="backupOrderHistory"></tbody>
+                </table>
+              </div>
+              <div id="backupTotalSpend" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+            </article>
+          </div>
+
+          <!-- Tips Card -->
+          <article class="card stack" style="margin-top:1rem">
+            <h3>💡 Power Backup Tips</h3>
+            <div class="panel-grid" id="backupTips"></div>
+          </article>
+        </section>
+
         <article class="card stack">
           <h3>Activity Log</h3>
           <ul id="events" class="list"></ul>

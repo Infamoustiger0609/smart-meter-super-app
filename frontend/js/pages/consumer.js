@@ -47,6 +47,7 @@ const pages = [
   ["outage", "Outage & Emergency", "warning"],
   ["greenenergy", "Solar & EV", "electric_bolt"],
   ["discom", "DISCOM Services", "business"],
+  ["powerbackup", "Power Backup", "battery_charging_full"],
   ["help", "Help Center", "help"],
   ["settings", "Settings", "settings"],
 ];
@@ -1546,6 +1547,7 @@ async function refreshPage(pageId) {
     outage: loadOutage,
     greenenergy: loadGreenEnergy,
     discom: loadDiscom,
+    powerbackup: loadPowerBackup,
   };
 
   if (handlers[page]) await handlers[page]();
@@ -2481,6 +2483,211 @@ async function loadDiscom() {
           `).join('');
     }
   } catch(err) {}
+}
+
+async function loadPowerBackup() {
+  const products = [
+    {
+      icon: '🔌',
+      name: 'Generator — 2 kW',
+      desc: 'Ideal for home lighting, fans, and basic appliances',
+      price: '₹800/day',
+      capacity: '2 kW',
+      runtime: '8 hrs on 2L fuel',
+      tag: 'Most Popular',
+      tagColor: 'var(--brand)',
+      bestFor: 'Small homes',
+    },
+    {
+      icon: '⚡',
+      name: 'Generator — 5 kW',
+      desc: 'Supports AC, refrigerator, and full home load',
+      price: '₹1,500/day',
+      capacity: '5 kW',
+      runtime: '10 hrs on 4L fuel',
+      tag: 'Recommended',
+      tagColor: 'var(--ok)',
+      bestFor: 'Medium homes',
+    },
+    {
+      icon: '🏭',
+      name: 'Generator — 10 kW',
+      desc: 'Heavy duty — offices, shops, large homes',
+      price: '₹2,800/day',
+      capacity: '10 kW',
+      runtime: '12 hrs on 8L fuel',
+      tag: 'Heavy Duty',
+      tagColor: '#7c3aed',
+      bestFor: 'Offices & large homes',
+    },
+    {
+      icon: '🔋',
+      name: 'Portable Battery — 2 kWh',
+      desc: 'Silent, clean power for lights, fans, phones, laptop',
+      price: '₹500/day',
+      capacity: '2 kWh',
+      runtime: '6–8 hrs',
+      tag: 'Silent & Clean',
+      tagColor: 'var(--ok)',
+      bestFor: 'Minimal backup',
+    },
+    {
+      icon: '🗄️',
+      name: 'Portable Battery — 5 kWh',
+      desc: 'Powers fridge, fan, TV, and lights simultaneously',
+      price: '₹900/day',
+      capacity: '5 kWh',
+      runtime: '10–12 hrs',
+      tag: 'Best Value',
+      tagColor: 'var(--warn)',
+      bestFor: 'Full home backup',
+    },
+    {
+      icon: '🔆',
+      name: 'Solar Generator — 1 kW',
+      desc: 'Self-charging solar unit — zero fuel cost',
+      price: '₹700/day',
+      capacity: '1 kW',
+      runtime: 'Unlimited (daylight)',
+      tag: 'Eco Friendly',
+      tagColor: '#16a34a',
+      bestFor: 'Daytime outages',
+    },
+  ];
+
+  const gridEl = document.getElementById('backupProductsGrid');
+  if (gridEl) {
+    gridEl.innerHTML = products.map(p => `
+      <article class="card" style="padding:16px;position:relative">
+        <div style="position:absolute;top:12px;right:12px;background:${p.tagColor};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${p.tag}</div>
+        <div style="font-size:36px;margin-bottom:8px">${p.icon}</div>
+        <h4 style="margin:0 0 4px;font-size:14px">${p.name}</h4>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${p.desc}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div style="background:var(--surface-muted);border-radius:8px;padding:6px;text-align:center">
+            <div style="font-size:10px;color:var(--muted)">Capacity</div>
+            <div style="font-size:13px;font-weight:600">${p.capacity}</div>
+          </div>
+          <div style="background:var(--surface-muted);border-radius:8px;padding:6px;text-align:center">
+            <div style="font-size:10px;color:var(--muted)">Runtime</div>
+            <div style="font-size:13px;font-weight:600">${p.runtime}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Best for: ${p.bestFor}</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px">${p.price}</div>
+        <button class="btn" style="width:100%;font-size:13px" onclick="
+          document.getElementById('backupProductType').value = '${p.name.toLowerCase().replace(/ —/,'').replace(/ /g,'_').replace(/\./g,'')}';
+          document.getElementById('backupOrderForm').scrollIntoView({behavior:'smooth'});
+        ">Rent Now</button>
+      </article>
+    `).join('');
+  }
+
+  const tips = [
+    { icon: '🔦', title: 'Calculate your backup need', desc: 'Add up wattage of essential appliances: Fan (75W) + Lights (40W) + Phone charger (20W) + WiFi (10W) = 145W minimum' },
+    { icon: '⛽', title: 'Generator fuel tip', desc: 'Keep 4–5 litres of petrol ready. A 2kW generator uses ~1L/hr at full load. Store fuel safely away from the unit.' },
+    { icon: '🔇', title: 'Noise & safety', desc: 'Never run generators indoors. Place at least 2 metres from windows. Battery backups are silent and safe for indoor use.' },
+    { icon: '📱', title: 'Prioritise essentials', desc: 'During cuts, turn off AC and geyser. Refrigerator, lights, fan, and phone chargers should be your primary loads.' },
+  ];
+
+  const tipsEl = document.getElementById('backupTips');
+  if (tipsEl) {
+    tipsEl.innerHTML = tips.map(t => `
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--surface-muted);border-radius:10px">
+        <span style="font-size:24px;flex-shrink:0">${t.icon}</span>
+        <div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px">${t.title}</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5">${t.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const orderForm = document.getElementById('backupOrderForm');
+  if (orderForm && !orderForm.dataset.bound) {
+    orderForm.dataset.bound = 'true';
+
+    // Set default start date to today
+    const startDateEl = document.getElementById('backupStartDate');
+    if (startDateEl && !startDateEl.value) {
+      startDateEl.value = new Date().toISOString().split('T')[0];
+    }
+
+    orderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const productType = document.getElementById('backupProductType').value;
+      const days = parseInt(document.getElementById('backupDays').value);
+      const address = document.getElementById('backupAddress').value;
+      const phone = document.getElementById('backupPhone').value;
+      const urgency = document.getElementById('backupUrgency').value;
+      const startDate = document.getElementById('backupStartDate').value;
+      const notes = document.getElementById('backupNotes').value;
+      const msgEl = document.getElementById('backupOrderMsg');
+
+      // Calculate price
+      const prices = {
+        'generator_2kw': 800, 'generator_5kw': 1500, 'generator_10kw': 2800,
+        'battery_2kwh': 500, 'battery_5kwh': 900, 'inverter_battery': 600,
+        'solar_generator': 700,
+      };
+      const dailyRate = prices[productType] || 800;
+      const total = dailyRate * days;
+
+      // Save order to localStorage
+      const orders = JSON.parse(localStorage.getItem('backup_orders') || '[]');
+      const orderId = `BKP-${Date.now().toString(36).toUpperCase()}`;
+      const newOrder = {
+        id: orderId,
+        product: productType,
+        days,
+        total,
+        status: urgency === 'emergency' ? 'Dispatched' : urgency === 'same_day' ? 'Confirmed' : 'Scheduled',
+        delivery: urgency === 'emergency' ? 'Within 2 hrs' : urgency === 'same_day' ? 'Within 6 hrs' : startDate,
+        date: new Date().toLocaleDateString(),
+      };
+      orders.unshift(newOrder);
+      localStorage.setItem('backup_orders', JSON.stringify(orders));
+
+      if (msgEl) {
+        msgEl.textContent = `✅ Order ${orderId} confirmed! Total: ₹${total.toLocaleString()} for ${days} day(s). ${urgency === 'emergency' ? 'Our team will contact you within 15 minutes.' : 'You will receive a confirmation call shortly.'}`;
+      }
+
+      orderForm.reset();
+      startDateEl.value = new Date().toISOString().split('T')[0];
+      logEvent(`Power backup rented: ${productType} for ${days} days — ₹${total}`);
+      renderBackupOrders();
+    });
+  }
+
+  renderBackupOrders();
+}
+
+function renderBackupOrders() {
+  const orders = JSON.parse(localStorage.getItem('backup_orders') || '[]');
+  const historyEl = document.getElementById('backupOrderHistory');
+  const totalEl = document.getElementById('backupTotalSpend');
+
+  if (historyEl) {
+    if (orders.length === 0) {
+      historyEl.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No rental orders yet</td></tr>';
+    } else {
+      historyEl.innerHTML = orders.map(o => `
+        <tr>
+          <td style="font-weight:600">${o.id}</td>
+          <td>${o.product.replace(/_/g,' ')}</td>
+          <td>${o.days} day(s)</td>
+          <td style="font-weight:600">₹${o.total.toLocaleString()}</td>
+          <td><span class="badge ${o.status === 'Dispatched' ? 'peak' : o.status === 'Confirmed' ? 'normal' : 'off-peak'}">${o.status}</span></td>
+          <td style="font-size:12px;color:var(--muted)">${o.delivery}</td>
+        </tr>
+      `).join('');
+    }
+  }
+
+  if (totalEl && orders.length > 0) {
+    const total = orders.reduce((sum, o) => sum + o.total, 0);
+    totalEl.textContent = `Total spent on rentals: ₹${total.toLocaleString()} across ${orders.length} order(s)`;
+  }
 }
 
 async function init() {
