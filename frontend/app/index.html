@@ -170,7 +170,7 @@
 
           <!-- Tariff Schedule Card -->
           <article class="card stack">
-            <h3 style="margin:0">Tariff Schedule â€” Today</h3>
+            <h3 style="margin:0">Tariff Schedule &mdash; Today</h3>
             <div class="tariff-schedule-container">
               <div class="tariff-segments">
                 <div class="tariff-segment off-peak" data-hours="00-06">
@@ -201,10 +201,10 @@
               <article class="recommendation-card">
                 <div class="recommendation-content">
                   <div class="recommendation-header">
-                    <span class="recommendation-icon">ðŸ’¡</span>
+                    <span class="recommendation-icon">&#128161;</span>
                     <h4>Run Washing Machine after 22:00 tonight</h4>
                   </div>
-                  <p class="recommendation-text">Off-peak Rs 4.00 vs current Rs 6.00 â†’ Save <strong>~â‚¹14/cycle</strong></p>
+                  <p class="recommendation-text">Off-peak Rs 4.00 vs current Rs 6.00 &rarr; Save <strong>~&#8377;14/cycle</strong></p>
                   <button class="btn btn-outline recommendation-btn" id="scheduleWMBtn">Schedule Now</button>
                 </div>
               </article>
@@ -212,10 +212,10 @@
               <article class="recommendation-card">
                 <div class="recommendation-content">
                   <div class="recommendation-header">
-                    <span class="recommendation-icon">ðŸŒ¡ï¸</span>
+                    <span class="recommendation-icon">&#127777;</span>
                     <h4>Pre-cool with AC before 17:00 (peak starts then)</h4>
                   </div>
-                  <p class="recommendation-text">Avoid Rs 8.50/kWh peak â†’ Save <strong>~â‚¹22 if run 1hr earlier</strong></p>
+                  <p class="recommendation-text">Avoid Rs 8.50/kWh peak &rarr; Save <strong>~&#8377;22 if run 1hr earlier</strong></p>
                   <button class="btn btn-outline recommendation-btn" id="scheduleACBtn">Schedule Now</button>
                 </div>
               </article>
@@ -223,10 +223,10 @@
               <article class="recommendation-card">
                 <div class="recommendation-content">
                   <div class="recommendation-header">
-                    <span class="recommendation-icon">ðŸš¿</span>
-                    <h4>Run Geyser between 00:00â€“06:00</h4>
+                    <span class="recommendation-icon">&#128703;</span>
+                    <h4>Run Geyser between 00:00&ndash;06:00</h4>
                   </div>
-                  <p class="recommendation-text">Cheapest slot of the day â†’ Save <strong>~â‚¹8 per use</strong></p>
+                  <p class="recommendation-text">Cheapest slot of the day &rarr; Save <strong>~&#8377;8 per use</strong></p>
                   <button class="btn btn-outline recommendation-btn" id="scheduleGeyserBtn">Schedule Now</button>
                 </div>
               </article>
@@ -321,7 +321,7 @@
                       background: #fff;
                       color: #dc2626;
                       cursor: pointer;
-                    ">ðŸ—‘ Clear All</button>
+                    ">&#128465; Clear All</button>
                   </div>
                   <div id="scheduleList" class="schedule-list-new"></div>
                 </div>
@@ -655,7 +655,7 @@ Support: support@intellismart.demo
               <div id="outageList" class="stack"></div>
             </article>
             <article class="card stack">
-              <h3>ðŸš¨ Emergency Electrician</h3>
+              <h3>&#128680; Emergency Electrician</h3>
               <p style="color:var(--muted);font-size:13px">Book a certified electrician for urgent repairs, faults, or safety issues.</p>
               <form id="emergencyForm" class="stack">
                 <select id="emergencyType">
@@ -669,11 +669,11 @@ Support: support@intellismart.demo
                 <input id="emergencyAddress" required placeholder="Your address" />
                 <textarea id="emergencyDesc" required placeholder="Describe the emergency" rows="3"></textarea>
                 <select id="emergencyUrgency">
-                  <option value="emergency">ðŸ”´ Emergency (within 1 hour)</option>
-                  <option value="urgent">ðŸŸ¡ Urgent (within 4 hours)</option>
-                  <option value="scheduled">ðŸŸ¢ Scheduled (next day)</option>
+                  <option value="emergency">&#128308; Emergency (within 1 hour)</option>
+                  <option value="urgent">&#128993; Urgent (within 4 hours)</option>
+                  <option value="scheduled">&#128994; Scheduled (next day)</option>
                 </select>
-                <button class="btn" type="submit" style="background:linear-gradient(135deg,#dc2626,#ef4444)">ðŸš¨ Book Electrician Now</button>
+                <button class="btn" type="submit" style="background:linear-gradient(135deg,#dc2626,#ef4444)">&#128680; Book Electrician Now</button>
               </form>
               <p id="emergencyMsg" class="result"></p>
             </article>
@@ -684,7 +684,7 @@ Support: support@intellismart.demo
         <section id="greenenergy" class="page">
           <div class="panel-grid">
             <article class="card stack">
-              <h3>â˜€ï¸ Solar ROI Calculator</h3>
+              <h3>&#9728; Solar ROI Calculator</h3>
               <form id="solarRoiForm" class="stack">
                 <div class="form-grid">
                   <input id="solarCapacity" type="number" min="1" step="0.5" placeholder="System capacity (kW)" />
@@ -695,7 +695,7 @@ Support: support@intellismart.demo
               <div id="solarRoiResult" class="result"></div>
             </article>
             <article class="card stack">
-              <h3>ðŸ”‹ EV Charging Cost Calculator</h3>
+              <h3>&#128267; EV Charging Cost Calculator</h3>
               <form id="evCalcForm" class="stack">
                 <div class="form-grid">
                   <input id="evBatterySize" type="number" min="10" step="5" placeholder="Battery size (kWh)" />
@@ -707,11 +707,11 @@ Support: support@intellismart.demo
             </article>
           </div>
           <article class="card stack">
-            <h3>âš¡ Nearby EV Charging Stations</h3>
+            <h3>&#9889; Nearby EV Charging Stations</h3>
             <div id="evStations" class="panel-grid"></div>
           </article>
           <article class="card stack">
-            <h3>ðŸª Solar Vendor Comparison</h3>
+            <h3>&#127818; Solar Vendor Comparison</h3>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Vendor</th><th>Price/kW</th><th>Warranty</th><th>Rating</th><th>Action</th></tr></thead>
@@ -758,7 +758,7 @@ Support: support@intellismart.demo
         <!-- Power Backup Page -->
         <section id="powerbackup" class="page">
           <div class="stack" style="margin-bottom:1rem">
-            <h3 style="margin:0">âš¡ Power Backup Solutions</h3>
+            <h3 style="margin:0">&#9889; Power Backup Solutions</h3>
             <p style="color:var(--muted);font-size:14px">Rent generators or batteries for emergencies and power cuts</p>
           </div>
 
@@ -768,17 +768,17 @@ Support: support@intellismart.demo
           <!-- Order Form -->
           <div class="panel-grid" style="margin-top:1rem">
             <article class="card stack">
-              <h3>ðŸ“¦ Place Rental Order</h3>
+              <h3>&#128230; Place Rental Order</h3>
               <p style="color:var(--muted);font-size:13px">Same-day delivery available in Delhi NCR for emergency orders.</p>
               <form id="backupOrderForm" class="stack">
                 <select id="backupProductType">
-                  <option value="generator_2kw">Generator â€” 2 kW (â‚¹800/day)</option>
-                  <option value="generator_5kw">Generator â€” 5 kW (â‚¹1,500/day)</option>
-                  <option value="generator_10kw">Generator â€” 10 kW (â‚¹2,800/day)</option>
-                  <option value="battery_2kwh">Portable Battery â€” 2 kWh (â‚¹500/day)</option>
-                  <option value="battery_5kwh">Portable Battery â€” 5 kWh (â‚¹900/day)</option>
-                  <option value="inverter_battery">Inverter + Battery Kit (â‚¹600/day)</option>
-                  <option value="solar_generator">Solar Generator â€” 1 kW (â‚¹700/day)</option>
+                  <option value="generator_2kw">Generator &mdash; 2 kW (&#8377;800/day)</option>
+                  <option value="generator_5kw">Generator &mdash; 5 kW (&#8377;1,500/day)</option>
+                  <option value="generator_10kw">Generator &mdash; 10 kW (&#8377;2,800/day)</option>
+                  <option value="battery_2kwh">Portable Battery &mdash; 2 kWh (&#8377;500/day)</option>
+                  <option value="battery_5kwh">Portable Battery &mdash; 5 kWh (&#8377;900/day)</option>
+                  <option value="inverter_battery">Inverter + Battery Kit (&#8377;600/day)</option>
+                  <option value="solar_generator">Solar Generator &mdash; 1 kW (&#8377;700/day)</option>
                 </select>
                 <div class="form-grid">
                   <input id="backupStartDate" type="date" required placeholder="Start Date" />
@@ -787,18 +787,18 @@ Support: support@intellismart.demo
                 <input id="backupAddress" required placeholder="Delivery address" />
                 <input id="backupPhone" required placeholder="Contact number" />
                 <select id="backupUrgency">
-                  <option value="emergency">ðŸ”´ Emergency â€” Within 2 hours</option>
-                  <option value="same_day">ðŸŸ¡ Same Day â€” Within 6 hours</option>
-                  <option value="next_day">ðŸŸ¢ Next Day â€” Scheduled delivery</option>
+                  <option value="emergency">&#128308; Emergency &mdash; Within 2 hours</option>
+                  <option value="same_day">&#128993; Same Day &mdash; Within 6 hours</option>
+                  <option value="next_day">&#128994; Next Day &mdash; Scheduled delivery</option>
                 </select>
                 <textarea id="backupNotes" placeholder="Additional notes (optional)" rows="2"></textarea>
-                <button class="btn" type="submit">ðŸ›’ Confirm Rental Order</button>
+                <button class="btn" type="submit">&#128722; Confirm Rental Order</button>
               </form>
               <p id="backupOrderMsg" class="result"></p>
             </article>
 
             <article class="card stack">
-              <h3>ðŸ“‹ My Rental Orders</h3>
+              <h3>&#128203; My Rental Orders</h3>
               <div class="table-wrap">
                 <table>
                   <thead>
@@ -820,7 +820,7 @@ Support: support@intellismart.demo
 
           <!-- Tips Card -->
           <article class="card stack" style="margin-top:1rem">
-            <h3>ðŸ’¡ Power Backup Tips</h3>
+            <h3>&#128161; Power Backup Tips</h3>
             <div class="panel-grid" id="backupTips"></div>
           </article>
         </section>
@@ -839,7 +839,7 @@ Support: support@intellismart.demo
     <div class="modal-card">
       <div class="modal-header">
         <h3>Add New Appliance</h3>
-        <button id="closeModalBtn" class="btn btn-outline" type="button">âœ•</button>
+        <button id="closeModalBtn" class="btn btn-outline" type="button">&times;</button>
       </div>
       <form id="addApplianceForm" class="stack">
         <div class="form-group">

@@ -2348,8 +2348,8 @@ async function loadWallet() {
         ${tiers.map(t => `
           <div style="flex:1;min-width:100px;padding:12px;border-radius:10px;border:2px solid ${t.name === currentTier.name ? t.color : 'var(--line)'};text-align:center;background:${t.name === currentTier.name ? t.color + '22' : 'var(--surface-muted)'}">
             <div style="font-weight:700;color:${t.color}">${t.name}</div>
-            <div style="font-size:11px;color:var(--muted)">${t.min}–${t.max === 99999 ? '∞' : t.max} pts</div>
-            ${t.name === currentTier.name ? '<div style="font-size:11px;font-weight:600;color:var(--ok)">✓ Current</div>' : ''}
+            <div style="font-size:11px;color:var(--muted)">${t.min}&ndash;${t.max === 99999 ? '&infin;' : t.max} pts</div>
+            ${t.name === currentTier.name ? '<div style="font-size:11px;font-weight:600;color:var(--ok)">&#10003; Current</div>' : ''}
           </div>
         `).join('')}
       </div>
@@ -2359,10 +2359,10 @@ async function loadWallet() {
   const offersEl = document.getElementById('walletOffers');
   if (offersEl) {
     const offers = [
-      { icon: '⚡', title: 'Shift load to off-peak', desc: 'Earn 50 pts per off-peak hour scheduled', action: 'Earn Now' },
-      { icon: '🌱', title: 'Reduce consumption 10%', desc: 'Earn 200 pts this month', action: 'Track Progress' },
-      { icon: '💰', title: 'Pay bill on time', desc: 'Earn 100 pts per on-time payment', action: 'Pay Bill' },
-      { icon: '☀️', title: 'Solar generation bonus', desc: 'Earn 5 pts per kWh exported to grid', action: 'View Solar' },
+      { icon: '&#9889;', title: 'Shift load to off-peak', desc: 'Earn 50 pts per off-peak hour scheduled', action: 'Earn Now' },
+      { icon: '&#127793;', title: 'Reduce consumption 10%', desc: 'Earn 200 pts this month', action: 'Track Progress' },
+      { icon: '&#128176;', title: 'Pay bill on time', desc: 'Earn 100 pts per on-time payment', action: 'Pay Bill' },
+      { icon: '&#9728;', title: 'Solar generation bonus', desc: 'Earn 5 pts per kWh exported to grid', action: 'View Solar' },
     ];
     offersEl.innerHTML = offers.map(o => `
       <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface-muted);border-radius:10px">
@@ -2400,7 +2400,7 @@ async function loadWallet() {
     redeemForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const pts = parseInt(document.getElementById('redeemPoints').value);
-      document.getElementById('redeemMsg').textContent = `✅ ${pts} points redeemed! Rs ${(pts * 0.1).toFixed(0)} credited to your bill.`;
+      document.getElementById('redeemMsg').textContent = `Success: ${pts} points redeemed! Rs ${(pts * 0.1).toFixed(0)} credited to your bill.`;
     });
   }
 }
@@ -2410,22 +2410,22 @@ async function loadMarketplace() {
   if (recEl) {
     recEl.innerHTML = `
       <div class="row" style="gap:12px;align-items:flex-start">
-        <span style="font-size:32px">🎯</span>
+        <span style="font-size:32px">&#127919;</span>
         <div>
           <h4 style="margin:0 0 4px">Based on your usage: Your AC runs 6+ hrs/day at peak tariff</h4>
-          <p style="margin:0;color:var(--muted);font-size:13px">Upgrading to a 5-star inverter AC could save you <strong style="color:var(--ok)">₹4,200/year</strong> in electricity costs</p>
+          <p style="margin:0;color:var(--muted);font-size:13px">Upgrading to a 5-star inverter AC could save you <strong style="color:var(--ok)">&#8377;4,200/year</strong> in electricity costs</p>
         </div>
       </div>
     `;
   }
 
   const products = [
-    { icon: '❄️', name: 'Daikin 1.5T 5-Star Inverter AC', rating: '5★', price: '₹42,990', savings: 'Save ₹4,200/yr', tag: 'Top Pick', link: 'https://www.flipkart.com' },
-    { icon: '🌀', name: 'Voltas 1.5T 4-Star Split AC', rating: '4★', price: '₹34,490', savings: 'Save ₹2,800/yr', tag: 'Budget Pick', link: 'https://www.amazon.in' },
-    { icon: '👕', name: 'LG 7kg 5-Star Washing Machine', rating: '5★', price: '₹28,990', savings: 'Save ₹1,200/yr', tag: 'Recommended', link: 'https://www.flipkart.com' },
-    { icon: '🚿', name: 'Racold 25L Solar Water Heater', rating: '5★', price: '₹18,500', savings: 'Save ₹3,600/yr', tag: 'Green Choice', link: 'https://www.amazon.in' },
-    { icon: '☀️', name: 'Loom Solar 3kW Rooftop Kit', rating: '5★', price: '₹1,20,000', savings: 'Save ₹18,000/yr', tag: 'Solar', link: 'https://www.loomsolar.com' },
-    { icon: '🔋', name: 'Luminous 150Ah Inverter Battery', rating: '4★', price: '₹12,800', savings: 'Backup: 8 hrs', tag: 'Backup Power', link: 'https://www.amazon.in' },
+    { icon: '&#10052;', name: 'Daikin 1.5T 5-Star Inverter AC', rating: '5&#11088;', price: '&#8377;42,990', savings: 'Save &#8377;4,200/yr', tag: 'Top Pick', link: 'https://www.flipkart.com' },
+    { icon: '&#127744;', name: 'Voltas 1.5T 4-Star Split AC', rating: '4&#11088;', price: '&#8377;34,490', savings: 'Save &#8377;2,800/yr', tag: 'Budget Pick', link: 'https://www.amazon.in' },
+    { icon: '&#128085;', name: 'LG 7kg 5-Star Washing Machine', rating: '5&#11088;', price: '&#8377;28,990', savings: 'Save &#8377;1,200/yr', tag: 'Recommended', link: 'https://www.flipkart.com' },
+    { icon: '&#128703;', name: 'Racold 25L Solar Water Heater', rating: '5&#11088;', price: '&#8377;18,500', savings: 'Save &#8377;3,600/yr', tag: 'Green Choice', link: 'https://www.amazon.in' },
+    { icon: '&#9728;', name: 'Loom Solar 3kW Rooftop Kit', rating: '5&#11088;', price: '&#8377;1,20,000', savings: 'Save &#8377;18,000/yr', tag: 'Solar', link: 'https://www.loomsolar.com' },
+    { icon: '&#128267;', name: 'Luminous 150Ah Inverter Battery', rating: '4&#11088;', price: '&#8377;12,800', savings: 'Backup: 8 hrs', tag: 'Backup Power', link: 'https://www.amazon.in' },
   ];
 
   const gridEl = document.getElementById('marketplaceGrid');
@@ -2438,7 +2438,7 @@ async function loadMarketplace() {
         <div style="font-size:13px;color:var(--muted)">${p.rating}</div>
         <div style="font-size:18px;font-weight:700;color:var(--text);margin:8px 0">${p.price}</div>
         <div style="font-size:12px;color:var(--ok);font-weight:600;margin-bottom:12px">${p.savings}</div>
-        <a href="${p.link}" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;font-size:13px">View Product →</a>
+        <a href="${p.link}" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;font-size:13px">View Product &rarr;</a>
       </article>
     `).join('');
   }
@@ -2455,7 +2455,7 @@ async function loadOutage() {
   if (mapEl) {
     mapEl.innerHTML = `
       <div style="text-align:center;padding:20px">
-        <div style="font-size:48px;margin-bottom:8px">🗺️</div>
+        <div style="font-size:48px;margin-bottom:8px">&#128506;</div>
         <div style="font-weight:600;margin-bottom:4px">Delhi NCR Grid Map</div>
         <div style="font-size:12px;color:var(--muted)">${outages.filter(o => o.status === 'ACTIVE').length} active outage(s) in your region</div>
         <div style="display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap">
@@ -2482,7 +2482,7 @@ async function loadOutage() {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface-muted);border-radius:10px;border-left:4px solid ${o.status === 'ACTIVE' ? 'var(--danger)' : 'var(--ok)'}">
         <div>
           <div style="font-weight:600;font-size:14px">${o.zone}</div>
-          <div style="font-size:12px;color:var(--muted)">${o.type} · Since ${o.since}</div>
+          <div style="font-size:12px;color:var(--muted)">${o.type} &middot; Since ${o.since}</div>
         </div>
         <div style="text-align:right">
           <span class="badge ${o.status === 'ACTIVE' ? 'peak' : 'off-peak'}">${o.status}</span>
@@ -2510,11 +2510,11 @@ async function loadOutage() {
             description: `${desc} | Address: ${address} | Urgency: ${urgency}`
           })
         }, state.token);
-        if (msgEl) msgEl.textContent = '✅ Electrician booked! You will receive a call within 30 minutes.';
+        if (msgEl) msgEl.textContent = 'Success: Electrician booked! You will receive a call within 30 minutes.';
         emergencyForm.reset();
         logEvent(`Emergency electrician booked: ${type}`);
       } catch(err) {
-        if (msgEl) msgEl.textContent = '❌ Booking failed. Please try again.';
+        if (msgEl) msgEl.textContent = 'Error: Booking failed. Please try again.';
       }
     });
   }
@@ -2522,9 +2522,9 @@ async function loadOutage() {
 
 async function loadGreenEnergy() {
   const vendors = [
-    { name: 'Tata Power Solar', price: '₹38,000/kW', warranty: '25 years', rating: '4.8★' },
-    { name: 'Adani Solar', price: '₹35,000/kW', warranty: '25 years', rating: '4.6★' },
-    { name: 'Loom Solar', price: '₹32,000/kW', warranty: '10 years', rating: '4.4★' },
+    { name: 'Tata Power Solar', price: '&#8377;38,000/kW', warranty: '25 years', rating: '4.8&#11088;' },
+    { name: 'Adani Solar', price: '&#8377;35,000/kW', warranty: '25 years', rating: '4.6&#11088;' },
+    { name: 'Loom Solar', price: '&#8377;32,000/kW', warranty: '10 years', rating: '4.4&#11088;' },
   ];
 
   const vendorsEl = document.getElementById('solarVendors');
@@ -2541,10 +2541,10 @@ async function loadGreenEnergy() {
   }
 
   const evStations = [
-    { name: 'Tata Power EV Hub', location: 'Sector 18, Noida', slots: 3, price: '₹15/kWh', status: 'Available' },
-    { name: 'Ather Grid', location: 'Sector 62, Noida', slots: 1, price: '₹12/kWh', status: 'Busy' },
-    { name: 'BPCL Charge Zone', location: 'NH-24, Delhi', slots: 5, price: '₹18/kWh', status: 'Available' },
-    { name: 'ChargePoint India', location: 'Connaught Place, Delhi', slots: 2, price: '₹14/kWh', status: 'Available' },
+    { name: 'Tata Power EV Hub', location: 'Sector 18, Noida', slots: 3, price: '&#8377;15/kWh', status: 'Available' },
+    { name: 'Ather Grid', location: 'Sector 62, Noida', slots: 1, price: '&#8377;12/kWh', status: 'Busy' },
+    { name: 'BPCL Charge Zone', location: 'NH-24, Delhi', slots: 5, price: '&#8377;18/kWh', status: 'Available' },
+    { name: 'ChargePoint India', location: 'Connaught Place, Delhi', slots: 2, price: '&#8377;14/kWh', status: 'Available' },
   ];
 
   const stationsEl = document.getElementById('evStations');
@@ -2552,11 +2552,11 @@ async function loadGreenEnergy() {
     stationsEl.innerHTML = evStations.map(s => `
       <article class="card" style="padding:16px">
         <div class="row" style="justify-content:space-between;margin-bottom:8px">
-          <strong style="font-size:14px">⚡ ${s.name}</strong>
+          <strong style="font-size:14px">&#9889; ${s.name}</strong>
           <span class="badge ${s.status === 'Available' ? 'off-peak' : 'peak'}">${s.status}</span>
         </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">📍 ${s.location}</div>
-        <div style="font-size:12px;margin-bottom:8px">${s.slots} slots · ${s.price}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">&#128205; ${s.location}</div>
+        <div style="font-size:12px;margin-bottom:8px">${s.slots} slots &middot; ${s.price}</div>
         <button class="btn btn-outline" style="font-size:12px;padding:6px 12px;width:100%" ${s.status === 'Busy' ? 'disabled' : ''}>
           ${s.status === 'Available' ? 'Book Slot' : 'Join Waitlist'}
         </button>
@@ -2631,12 +2631,12 @@ async function loadDiscom() {
             description: `Name: ${name} | Address: ${address} | Phone: ${phone} | Details: ${details}`
           })
         }, state.token);
-        if (msgEl) msgEl.textContent = `✅ Request submitted! ID: ${res.data.request_id}`;
+        if (msgEl) msgEl.textContent = `Success: Request submitted! ID: ${res.data.request_id}`;
         discomForm.reset();
         loadDiscom();
         logEvent(`DISCOM request submitted: ${type}`);
       } catch(err) {
-        if (msgEl) msgEl.textContent = '❌ Submission failed. Please try again.';
+        if (msgEl) msgEl.textContent = 'Error: Submission failed. Please try again.';
       }
     });
   }
@@ -2663,10 +2663,10 @@ async function loadDiscom() {
 async function loadPowerBackup() {
   const products = [
     {
-      icon: '🔌',
-      name: 'Generator — 2 kW',
+      icon: '&#128268;',
+      name: 'Generator - 2 kW',
       desc: 'Ideal for home lighting, fans, and basic appliances',
-      price: '₹800/day',
+      price: '&#8377;800/day',
       capacity: '2 kW',
       runtime: '8 hrs on 2L fuel',
       tag: 'Most Popular',
@@ -2674,10 +2674,10 @@ async function loadPowerBackup() {
       bestFor: 'Small homes',
     },
     {
-      icon: '⚡',
-      name: 'Generator — 5 kW',
+      icon: '&#9889;',
+      name: 'Generator - 5 kW',
       desc: 'Supports AC, refrigerator, and full home load',
-      price: '₹1,500/day',
+      price: '&#8377;1,500/day',
       capacity: '5 kW',
       runtime: '10 hrs on 4L fuel',
       tag: 'Recommended',
@@ -2685,10 +2685,10 @@ async function loadPowerBackup() {
       bestFor: 'Medium homes',
     },
     {
-      icon: '🏭',
-      name: 'Generator — 10 kW',
-      desc: 'Heavy duty — offices, shops, large homes',
-      price: '₹2,800/day',
+      icon: '&#127981;',
+      name: 'Generator - 10 kW',
+      desc: 'Heavy duty - offices, shops, large homes',
+      price: '&#8377;2,800/day',
       capacity: '10 kW',
       runtime: '12 hrs on 8L fuel',
       tag: 'Heavy Duty',
@@ -2696,32 +2696,32 @@ async function loadPowerBackup() {
       bestFor: 'Offices & large homes',
     },
     {
-      icon: '🔋',
-      name: 'Portable Battery — 2 kWh',
+      icon: '&#128267;',
+      name: 'Portable Battery - 2 kWh',
       desc: 'Silent, clean power for lights, fans, phones, laptop',
-      price: '₹500/day',
+      price: '&#8377;500/day',
       capacity: '2 kWh',
-      runtime: '6–8 hrs',
+      runtime: '6&ndash;8 hrs',
       tag: 'Silent & Clean',
       tagColor: 'var(--ok)',
       bestFor: 'Minimal backup',
     },
     {
-      icon: '🗄️',
-      name: 'Portable Battery — 5 kWh',
+      icon: '&#128452;',
+      name: 'Portable Battery - 5 kWh',
       desc: 'Powers fridge, fan, TV, and lights simultaneously',
-      price: '₹900/day',
+      price: '&#8377;900/day',
       capacity: '5 kWh',
-      runtime: '10–12 hrs',
+      runtime: '10&ndash;12 hrs',
       tag: 'Best Value',
       tagColor: 'var(--warn)',
       bestFor: 'Full home backup',
     },
     {
-      icon: '🔆',
-      name: 'Solar Generator — 1 kW',
-      desc: 'Self-charging solar unit — zero fuel cost',
-      price: '₹700/day',
+      icon: '&#128262;',
+      name: 'Solar Generator - 1 kW',
+      desc: 'Self-charging solar unit - zero fuel cost',
+      price: '&#8377;700/day',
       capacity: '1 kW',
       runtime: 'Unlimited (daylight)',
       tag: 'Eco Friendly',
@@ -2751,7 +2751,7 @@ async function loadPowerBackup() {
         <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Best for: ${p.bestFor}</div>
         <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px">${p.price}</div>
         <button class="btn" style="width:100%;font-size:13px" onclick="
-          document.getElementById('backupProductType').value = '${p.name.toLowerCase().replace(/ —/,'').replace(/ /g,'_').replace(/\./g,'')}';
+          document.getElementById('backupProductType').value = '${p.name.toLowerCase().replace(/ -/,'').replace(/ /g,'_').replace(/\./g,'')}';
           document.getElementById('backupOrderForm').scrollIntoView({behavior:'smooth'});
         ">Rent Now</button>
       </article>
@@ -2759,10 +2759,10 @@ async function loadPowerBackup() {
   }
 
   const tips = [
-    { icon: '🔦', title: 'Calculate your backup need', desc: 'Add up wattage of essential appliances: Fan (75W) + Lights (40W) + Phone charger (20W) + WiFi (10W) = 145W minimum' },
-    { icon: '⛽', title: 'Generator fuel tip', desc: 'Keep 4–5 litres of petrol ready. A 2kW generator uses ~1L/hr at full load. Store fuel safely away from the unit.' },
-    { icon: '🔇', title: 'Noise & safety', desc: 'Never run generators indoors. Place at least 2 metres from windows. Battery backups are silent and safe for indoor use.' },
-    { icon: '📱', title: 'Prioritise essentials', desc: 'During cuts, turn off AC and geyser. Refrigerator, lights, fan, and phone chargers should be your primary loads.' },
+    { icon: '&#128294;', title: 'Calculate your backup need', desc: 'Add up wattage of essential appliances: Fan (75W) + Lights (40W) + Phone charger (20W) + WiFi (10W) = 145W minimum' },
+    { icon: '&#9981;', title: 'Generator fuel tip', desc: 'Keep 4&ndash;5 litres of petrol ready. A 2kW generator uses ~1L/hr at full load. Store fuel safely away from the unit.' },
+    { icon: '&#128263;', title: 'Noise & safety', desc: 'Never run generators indoors. Place at least 2 metres from windows. Battery backups are silent and safe for indoor use.' },
+    { icon: '&#128241;', title: 'Prioritise essentials', desc: 'During cuts, turn off AC and geyser. Refrigerator, lights, fan, and phone chargers should be your primary loads.' },
   ];
 
   const tipsEl = document.getElementById('backupTips');
@@ -2824,12 +2824,12 @@ async function loadPowerBackup() {
       localStorage.setItem('backup_orders', JSON.stringify(orders));
 
       if (msgEl) {
-        msgEl.textContent = `✅ Order ${orderId} confirmed! Total: ₹${total.toLocaleString()} for ${days} day(s). ${urgency === 'emergency' ? 'Our team will contact you within 15 minutes.' : 'You will receive a confirmation call shortly.'}`;
+        msgEl.textContent = `Success: Order ${orderId} confirmed! Total: Rs ${total.toLocaleString()} for ${days} day(s). ${urgency === 'emergency' ? 'Our team will contact you within 15 minutes.' : 'You will receive a confirmation call shortly.'}`;
       }
 
       orderForm.reset();
       startDateEl.value = new Date().toISOString().split('T')[0];
-      logEvent(`Power backup rented: ${productType} for ${days} days — ₹${total}`);
+      logEvent(`Power backup rented: ${productType} for ${days} days - Rs ${total}`);
       renderBackupOrders();
     });
   }
@@ -2851,7 +2851,7 @@ function renderBackupOrders() {
           <td style="font-weight:600">${o.id}</td>
           <td>${o.product.replace(/_/g,' ')}</td>
           <td>${o.days} day(s)</td>
-          <td style="font-weight:600">₹${o.total.toLocaleString()}</td>
+          <td style="font-weight:600">Rs ${o.total.toLocaleString()}</td>
           <td><span class="badge ${o.status === 'Dispatched' ? 'peak' : o.status === 'Confirmed' ? 'normal' : 'off-peak'}">${o.status}</span></td>
           <td style="font-size:12px;color:var(--muted)">${o.delivery}</td>
         </tr>
@@ -2861,7 +2861,7 @@ function renderBackupOrders() {
 
   if (totalEl && orders.length > 0) {
     const total = orders.reduce((sum, o) => sum + o.total, 0);
-    totalEl.textContent = `Total spent on rentals: ₹${total.toLocaleString()} across ${orders.length} order(s)`;
+    totalEl.textContent = `Total spent on rentals: Rs ${total.toLocaleString()} across ${orders.length} order(s)`;
   }
 }
 
