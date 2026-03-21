@@ -2035,3 +2035,227 @@ svg {
   }
 }
 
+/* ── Redesigned KPI Cards ───────────────────── */
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 20px;
+  min-height: 200px;
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.kpi-badge-live {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+  padding: 2px 8px;
+  border-radius: 20px;
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.kpi-meter-id {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-family: monospace;
+  opacity: 0.7;
+}
+
+.kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.kpi-big {
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  font-family: "Manrope", sans-serif;
+}
+
+.kpi-unit {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.kpi-spark-wrap {
+  flex: 1;
+  min-height: 48px;
+  max-height: 60px;
+  margin: 8px 0 4px;
+  position: relative;
+}
+
+.kpi-trend {
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.kpi-tariff-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  flex-shrink: 0;
+}
+
+.kpi-cost-stats {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0 4px;
+}
+
+.kpi-cost-stat {
+  flex: 1;
+  background: var(--surface-muted);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kpi-cost-stat span {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-cost-stat strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Savings Potential card — clean layout */
+.kpi-savings {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.kpi-savings .savings-gauge {
+  width: 120px;
+  height: 120px;
+  margin: 8px auto 4px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.kpi-savings .savings-gauge-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 85%;
+}
+
+.kpi-savings .savings-gauge-center strong {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: block;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.kpi-savings .savings-gauge-center small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.savings-bottom-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: stretch;
+}
+
+.savings-pct-box {
+  flex: 1;
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.savings-pct-big {
+  font-size: 1.6rem !important;
+  font-weight: 700;
+  color: var(--ok);
+  font-family: "Manrope", sans-serif;
+  line-height: 1;
+}
+
+.savings-pct-box span {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.savings-monthly {
+  flex: 1;
+  background: var(--surface-muted);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.savings-monthly span {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.savings-monthly strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ok);
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .kpi { min-height: 160px; padding: 14px; }
+  .kpi-big { font-size: 1.8rem; }
+  .kpi-cost-stats { gap: 8px; }
+}
+
