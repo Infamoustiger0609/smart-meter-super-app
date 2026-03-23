@@ -36,6 +36,8 @@ from backend.routers.service_router import router as service_router
 from backend.routers.solar_router import router as solar_router
 from backend.routers.subscription_router import router as subscription_router
 from backend.services.bootstrap import initialize_demo_state
+from backend.database.seed import seed
+from backend.database.db import create_tables
 
 app = FastAPI(title="Smart Meter Super App")
 logger = logging.getLogger("superapp")
@@ -59,6 +61,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 def bootstrap_seed_data():
+    create_tables()
+    seed()
     initialize_demo_state()
 
 
