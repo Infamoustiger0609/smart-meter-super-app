@@ -123,6 +123,6 @@ See `DEMO_GUIDE.md` for a recommended hackathon presentation flow.
 
 See `API_USAGE_OPTIMIZATION.md` for deterministic routing strategy that reduces external LLM calls.
 
-##
+## DEPLOYED LINK
 
 URL- https://smart-meter-super-app.onrender.com/
