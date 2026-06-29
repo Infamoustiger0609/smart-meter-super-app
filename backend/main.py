@@ -22,6 +22,7 @@ from backend.ai_engine import generate_ai_response
 from backend.cost import get_current_cost, get_billing_estimate
 from backend.optimizer import get_optimized_savings
 from backend.scheduler import add_schedule, get_schedules, run_schedules, clear_all_schedules
+from backend.database.memory_store import MemoryStore
 from backend.routers.admin_router import router as admin_router
 from backend.routers.auth_router import router as auth_router
 from backend.routers.billing_router import router as billing_router
@@ -35,9 +36,8 @@ from backend.routers.payment_router import router as payment_router
 from backend.routers.service_router import router as service_router
 from backend.routers.solar_router import router as solar_router
 from backend.routers.subscription_router import router as subscription_router
-from backend.services.bootstrap import initialize_demo_state
-from backend.database.seed import seed
-from backend.database.db import create_tables
+
+store = MemoryStore()
 
 app = FastAPI(title="Smart Meter Super App")
 logger = logging.getLogger("superapp")
@@ -61,9 +61,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 def bootstrap_seed_data():
-    create_tables()
-    seed()
-    initialize_demo_state()
+    print(">>> Using in-memory data store (no database required)")
+    # In-memory store auto-seeds on import, no action needed
 
 
 @app.middleware("http")
